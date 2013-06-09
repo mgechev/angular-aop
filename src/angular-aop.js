@@ -5,8 +5,8 @@ var AngularAop = angular.module('AngularAOP', []);
      * Service which give access to the pointcuts.
      */
     AngularAop.factory('execute', ['$q', function Base($q) {
-        var slice = Array.prototype.slice;
 
+        var slice = Array.prototype.slice;
 
         function Advice(aspect) {
             this._aspect = aspect;
@@ -28,7 +28,7 @@ var AngularAop = angular.module('AngularAOP', []);
             return function () {
                 var args = slice.call(arguments);
                 args = [this, jointPoint].concat(args);
-                self._wrapper.apply(self, args);
+                return self._wrapper.apply(self, args);
             };
         };
 
@@ -45,7 +45,6 @@ var AngularAop = angular.module('AngularAOP', []);
         Advice.prototype._wrapper = function () {
             throw 'Not implemented';
         };
-
 
         function Before() {
             Advice.apply(this, arguments);
@@ -89,6 +88,77 @@ var AngularAop = angular.module('AngularAOP', []);
             return result;
         };
 
+        function OnThrow() {
+            Advice.apply(this, arguments);
+        }
+        OnThrow.prototype = Object.create(Advice.prototype);
+        OnThrow.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                aspectArgs = args;
+            try {
+                jointPoint.call(context, args);
+            } catch (e) {
+                aspectArgs.unshift(e);
+                this._aspect.apply(context, aspectArgs);
+            }
+        };
+
+        function OnResolve() {
+            Advice.apply(this, arguments);
+        }
+        OnResolve.prototype = Object.create(Advice.prototype);
+        OnResolve.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                promise = jointPoint.apply(context, args),
+                self = this;
+            promise.then(function () {
+                self._aspect.apply(context, slice.call(arguments));
+            });
+            return promise;
+        };
+
+        function AfterResolve() {
+            Advice.apply(this, arguments);
+        }
+        AfterResolve.prototype = Object.create(Advice.prototype);
+        AfterResolve.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                deferred = $q.defer(),
+                innerPromise = deferred.promise,
+                promise = jointPoint.apply(context, args),
+                self = this;
+            promise.then(function () {
+                var callbackArgs = slice.call(arguments);
+                innerPromise.then(function () {
+                    self._aspect.apply(context, callbackArgs);
+                });
+                deferred.resolve();
+            });
+            return innerPromise;
+        };
+
+        function OnReject() {
+            Advice.apply(this, arguments);
+        }
+        OnReject.prototype = Object.create(Advice.prototype);
+        OnReject.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                promise = jointPoint.apply(context, args),
+                self = this;
+            promise.then(undef, function () {
+                self._aspect.apply(context, slice.call(arguments));
+            });
+            return promise;
+        };
+
         /**
          * Defines and implements the different advices.
          *
@@ -96,77 +166,19 @@ var AngularAop = angular.module('AngularAOP', []);
          * @private
          * @param {Function} aspect The join point to which the advice should be applied
          */
-        function Advices(aspect) {
-
+        function AdviceCollection(aspect) {
             this.before = new Before(aspect).getAdvice();
             this.after = new After(aspect).getAdvice();
             this.around = new Around(aspect).getAdvice();
-
-            this.onThrowOf = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments),
-                        aspectArgs = args;
-                    try {
-                        jointPoint.call(this, args);
-                    } catch (e) {
-                        aspectArgs.unshift(e);
-                        self._aspect.apply(this, aspectArgs);
-                    }
-                };
-            };
-
-            this.onResolveOf = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments),
-                        promise = jointPoint.apply(this, args);
-                    promise.then(function () {
-                        self._aspect.apply(this, slice.call(arguments));
-                    });
-                    return promise;
-                };
-            };
-
-            this.afterResolveOf = function (jointPoint) {
-                return function () {
-                    var deferred = $q.defer(),
-                        innerPromise = deferred.promise,
-                        args = slice.call(arguments),
-                        promise = jointPoint.apply(this, args);
-                    promise.then(function () {
-                        var callbackArgs = slice.call(arguments);
-                        innerPromise.then(function () {
-                            self._aspect.apply(this, callbackArgs);
-                        });
-                        deferred.resolve();
-                    });
-                    return innerPromise;
-                };
-            };
-
-            this.onRejectOf = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments),
-                        promise = jointPoint.apply(this, args);
-                    promise.then(undef, function () {
-                        self._aspect.apply(this, slice.call(arguments));
-                    });
-                    return promise;
-                };
-            };
+            this.onThrowOf = new OnThrow(aspect).getAdvice();
+            this.onResolveOf = new OnResolve(aspect).getAdvice();
+            this.afterResolveOf = new AfterResolve(aspect).getAdvice();
+            this.onRejectOf = new OnReject(aspect).getAdvice();
         }
 
         return function (aspect) {
-            return new Advices(aspect);
+            return new AdviceCollection(aspect);
         };
     }]);
 
 }(undefined));
-
-/**
- * Simple aspect which logs all the arguments it recieves
- */
-AngularAop.factory('Logger', function () {
-    return function () {
-        console.log(arguments);
-    };
-});
