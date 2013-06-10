@@ -7,6 +7,88 @@ var AngularAop = angular.module('AngularAOP', []);
     AngularAop.factory('execute', ['$q', function Base($q) {
         var slice = Array.prototype.slice;
 
+
+        function Advice(aspect) {
+            this._aspect = aspect;
+        }
+
+        Advice.prototype.getAdvice = function () {
+            var self = this;
+            return function (jointPoint) {
+                if (typeof jointPoint === 'function') {
+                    return self._getFunctionAdvice(jointPoint);
+                } else if (jointPoint) {
+                    return self._getObjectAdvice(jointPoint);
+                }
+            };
+        };
+
+        Advice.prototype._getFunctionAdvice = function (jointPoint) {
+            var self = this;
+            return function () {
+                var args = slice.call(arguments);
+                args = [this, jointPoint].concat(args);
+                self._wrapper.apply(self, args);
+            };
+        };
+
+        Advice.prototype._getObjectAdvice = function (jointPoint) {
+            for (var prop in jointPoint) {
+                if (jointPoint.hasOwnProperty(prop) &&
+                    typeof jointPoint[prop] === 'function') {
+                    jointPoint[prop] = this._getFunctionAdvice(jointPoint[prop]);
+                }
+            }
+            return jointPoint;
+        };
+
+        Advice.prototype._wrapper = function () {
+            throw 'Not implemented';
+        };
+
+
+        function Before() {
+            Advice.apply(this, arguments);
+        }
+        Before.prototype = Object.create(Advice.prototype);
+        Before.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift();
+            this._aspect.apply(context, args);
+            return jointPoint.apply(context, args);
+        };
+
+        function After() {
+            Advice.apply(this, arguments);
+        }
+        After.prototype = Object.create(Advice.prototype);
+        After.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                result = jointPoint.apply(context, args),
+                aspectArgs = [result];
+            this._aspect.apply(context, aspectArgs.concat(args));
+            return result;
+        };
+
+        function Around() {
+            Advice.apply(this, arguments);
+        }
+        Around.prototype = Object.create(Advice.prototype);
+        Around.prototype._wrapper = function () {
+            var args = slice.call(arguments),
+                context = args.shift(),
+                jointPoint = args.shift(),
+                aspectArgs, result;
+            this._aspect.apply(context, args);
+            result = jointPoint.apply(context, args);
+            aspectArgs = [result];
+            this._aspect.apply(context, aspectArgs.concat(args));
+            return result;
+        };
+
         /**
          * Defines and implements the different advices.
          *
@@ -16,47 +98,9 @@ var AngularAop = angular.module('AngularAOP', []);
          */
         function Advices(aspect) {
 
-            /**
-             * Keeps a reference to the outer, parent context.
-             */
-            var self = this;
-
-            /**
-             * The the aspect which will be applied.
-             */
-            this._aspect = aspect;
-
-            this.before = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments);
-                    self._aspect.apply(this, args);
-                    return jointPoint.apply(this, args);
-                };
-            };
-
-            this.after = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments),
-                        result = jointPoint.apply(this, args),
-                        aspectArgs;
-                    aspectArgs = [result];
-                    self._aspect.apply(this, aspectArgs.concat(args));
-                    return result;
-                };
-            };
-
-            this.around = function (jointPoint) {
-                return function () {
-                    var args = slice.call(arguments),
-                        aspectArgs,
-                        result;
-                    self._aspect.apply(this, aspectArgs);
-                    result = jointPoint.apply(this, args);
-                    aspectArgs = [result];
-                    self._aspect.apply(this, aspectArgs.concat(args));
-                    return result;
-                };
-            };
+            this.before = new Before(aspect).getAdvice();
+            this.after = new After(aspect).getAdvice();
+            this.around = new Around(aspect).getAdvice();
 
             this.onThrowOf = function (jointPoint) {
                 return function () {
