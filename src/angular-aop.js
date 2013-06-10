@@ -103,7 +103,7 @@ var AngularAop = angular.module('AngularAOP', []);
                 return function () {
                     var args = slice.call(arguments),
                         promise = jointPoint.apply(this, args);
-                    promise.then(undefined, function () {
+                    promise.then(undef, function () {
                         self._aspect.apply(this, slice.call(arguments));
                     });
                     return promise;
