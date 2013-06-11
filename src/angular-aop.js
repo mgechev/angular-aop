@@ -14,32 +14,32 @@ var AngularAop = angular.module('AngularAOP', []);
 
         Advice.prototype.getAdvice = function () {
             var self = this;
-            return function (jointPoint) {
-                if (typeof jointPoint === 'function') {
-                    return self._getFunctionAdvice(jointPoint);
-                } else if (jointPoint) {
-                    return self._getObjectAdvice(jointPoint);
+            return function (method) {
+                if (typeof method === 'function') {
+                    return self._getFunctionAdvice(method);
+                } else if (method) {
+                    return self._getObjectAdvice(method);
                 }
             };
         };
 
-        Advice.prototype._getFunctionAdvice = function (jointPoint) {
+        Advice.prototype._getFunctionAdvice = function (method) {
             var self = this;
             return function () {
                 var args = slice.call(arguments);
-                args = [this, jointPoint].concat(args);
+                args = [this, method].concat(args);
                 return self._wrapper.apply(self, args);
             };
         };
 
-        Advice.prototype._getObjectAdvice = function (jointPoint) {
-            for (var prop in jointPoint) {
-                if (jointPoint.hasOwnProperty(prop) &&
-                    typeof jointPoint[prop] === 'function') {
-                    jointPoint[prop] = this._getFunctionAdvice(jointPoint[prop]);
+        Advice.prototype._getObjectAdvice = function (method) {
+            for (var prop in method) {
+                if (method.hasOwnProperty(prop) &&
+                    typeof method[prop] === 'function') {
+                    method[prop] = this._getFunctionAdvice(method[prop]);
                 }
             }
-            return jointPoint;
+            return method;
         };
 
         Advice.prototype._wrapper = function () {
@@ -53,9 +53,9 @@ var AngularAop = angular.module('AngularAOP', []);
         Before.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift();
+                method = args.shift();
             this._aspect.apply(context, args);
-            return jointPoint.apply(context, args);
+            return method.apply(context, args);
         };
 
         function After() {
@@ -65,8 +65,8 @@ var AngularAop = angular.module('AngularAOP', []);
         After.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
-                result = jointPoint.apply(context, args),
+                method = args.shift(),
+                result = method.apply(context, args),
                 aspectArgs = [result];
             this._aspect.apply(context, aspectArgs.concat(args));
             return result;
@@ -79,10 +79,10 @@ var AngularAop = angular.module('AngularAOP', []);
         Around.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
+                method = args.shift(),
                 aspectArgs, result;
             this._aspect.apply(context, args);
-            result = jointPoint.apply(context, args);
+            result = method.apply(context, args);
             aspectArgs = [result];
             this._aspect.apply(context, aspectArgs.concat(args));
             return result;
@@ -95,10 +95,10 @@ var AngularAop = angular.module('AngularAOP', []);
         OnThrow.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
+                method = args.shift(),
                 aspectArgs = args;
             try {
-                jointPoint.call(context, args);
+                method.call(context, args);
             } catch (e) {
                 aspectArgs.unshift(e);
                 this._aspect.apply(context, aspectArgs);
@@ -112,8 +112,8 @@ var AngularAop = angular.module('AngularAOP', []);
         OnResolve.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
-                promise = jointPoint.apply(context, args),
+                method = args.shift(),
+                promise = method.apply(context, args),
                 self = this;
             promise.then(function () {
                 self._aspect.apply(context, slice.call(arguments));
@@ -128,10 +128,10 @@ var AngularAop = angular.module('AngularAOP', []);
         AfterResolve.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
+                method = args.shift(),
                 deferred = $q.defer(),
                 innerPromise = deferred.promise,
-                promise = jointPoint.apply(context, args),
+                promise = method.apply(context, args),
                 self = this;
             promise.then(function () {
                 var callbackArgs = slice.call(arguments);
@@ -150,8 +150,8 @@ var AngularAop = angular.module('AngularAOP', []);
         OnReject.prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
-                jointPoint = args.shift(),
-                promise = jointPoint.apply(context, args),
+                method = args.shift(),
+                promise = method.apply(context, args),
                 self = this;
             promise.then(undef, function () {
                 self._aspect.apply(context, slice.call(arguments));
