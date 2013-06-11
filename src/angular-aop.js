@@ -6,7 +6,21 @@ var AngularAop = angular.module('AngularAOP', []);
      */
     AngularAop.factory('execute', ['$q', function Base($q) {
 
-        var slice = Array.prototype.slice;
+        var slice = Array.prototype.slice,
+            trim = (function () {
+                var trimFunction;
+                if (typeof String.prototype.trim === 'function') {
+                    trimFunction = String.prototype.trim;
+                } else {
+                    trimFunction = function () {
+                        return this === null ?
+                            '' :
+                            (this + '').replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+                    };
+                }
+                return trimFunction;
+            }()),
+            defaultRule = /.*/;
 
         function Advice(aspect) {
             this._aspect = aspect;
@@ -14,11 +28,11 @@ var AngularAop = angular.module('AngularAOP', []);
 
         Advice.prototype.getAdvice = function () {
             var self = this;
-            return function (method) {
-                if (typeof method === 'function') {
-                    return self._getFunctionAdvice(method);
-                } else if (method) {
-                    return self._getObjectAdvice(method);
+            return function (jp, rules) {
+                if (typeof jp === 'function') {
+                    return self._getFunctionAdvice(jp);
+                } else if (jp) {
+                    return self._getObjectAdvice(jp, rules || {});
                 }
             };
         };
@@ -32,14 +46,49 @@ var AngularAop = angular.module('AngularAOP', []);
             };
         };
 
-        Advice.prototype._getObjectAdvice = function (method) {
-            for (var prop in method) {
-                if (method.hasOwnProperty(prop) &&
-                    typeof method[prop] === 'function') {
-                    method[prop] = this._getFunctionAdvice(method[prop]);
+        Advice.prototype._getObjectAdvice = function (obj, rules) {
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop) &&
+                    typeof obj[prop] === 'function' &&
+                    this._matchRules(obj, prop, rules)) {
+                    obj[prop] = this._getFunctionAdvice(obj[prop]);
                 }
             }
-            return method;
+            return obj;
+        };
+
+        Advice.prototype._matchRules = function (obj, prop, rules) {
+            var methodPattern = rules.methodPattern || defaultRule,
+                argsPatterns = rules.argsPatterns || [],
+                tokens = this._parseMethod(obj, prop),
+                passed = true;
+            if (methodPattern.test(tokens.method)) {
+                tokens.args.forEach(function (arg, idx) {
+                    var rule = argsPatterns[idx] || defaultRule;
+                    if (!rule.test(arg)) {
+                        passed = false;
+                        return;
+                    }
+                });
+            } else {
+                passed = false;
+            }
+            return passed;
+        };
+
+        Advice.prototype._parseMethod = function (obj, prop) {
+            var result = {
+                    method: prop
+                },
+                parts = obj[prop].toString().match(/function\s*\(([^\)]+)/);
+            if (parts && parts[1]) {
+                result.args = parts[1].split(',').map(function (arg) {
+                    return arg.trim();
+                });
+            } else {
+                result.args = [];
+            }
+            return result;
         };
 
         Advice.prototype._wrapper = function () {

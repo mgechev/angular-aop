@@ -1,7 +1,9 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('LoginCtrl', function ($scope, LoginService) {
-    LoginService.login(42);
+    LoginService.register('Register', 'method');
+    LoginService.login('Login', 'method');
+    LoginService.logout('Logout', 'method');
     LoginService.loadUser();
 });
 
@@ -20,13 +22,26 @@ DemoApp.factory('LoginService', function ($q, $rootScope, execute, Logger) {
                 }, 500);
                 return deferred.promise;
             }),
-            login: function (param) {
-                if (!username || !password) {
-                    throw new Error('No username or password');
-                }
+            register: function (user, pass) {
+                throw Error('register is not implemented');
+            },
+            login: function (user, pass) {
+                console.log('Login called');
+                return 'Login';
+            },
+            logout: function (username, password) {
+                console.log('Logout called');
+                return 'Logout';
             }
         };
-    return execute(Logger).onThrowOf(api);
+        api = execute(Logger).after(api, {
+            methodPattern: /^l/,
+            argsPatterns: [/^user/, /^pass$/]
+        });
+        api = execute(Logger).onThrowOf(api, {
+            methodPattern: /^reg/
+        });
+    return api;
 });
 
 DemoApp.factory('Logger', function () {
@@ -38,6 +53,6 @@ DemoApp.factory('Logger', function () {
                 args.splice(idx, 1);
             }
         });
-        console.log(angular.toJson(args));
+        console.log('%cLogger: ' + angular.toJson(args), 'color: #5EAFFF; font-style: italic;');
     };
 });
