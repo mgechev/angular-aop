@@ -2,6 +2,7 @@ DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('LoginCtrl', function ($scope, LoginService) {
     LoginService.login(42);
+    LoginService.logout();
     LoginService.loadUser();
 });
 
@@ -24,9 +25,12 @@ DemoApp.factory('LoginService', function ($q, $rootScope, execute, Logger) {
                 if (!username || !password) {
                     throw new Error('No username or password');
                 }
+            },
+            logout: function () {
+                throw 'Not implemented';
             }
         };
-    return execute(Logger).onThrowOf(api);
+    return execute(Logger).onThrowOf(api, /login|logout/);
 });
 
 DemoApp.factory('Logger', function () {

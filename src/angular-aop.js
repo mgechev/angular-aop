@@ -4,7 +4,7 @@ var AngularAop = angular.module('AngularAOP', []);
     /**
      * Service which give access to the pointcuts.
      */
-    AngularAop.factory('execute', ['$q', function Base($q) {
+    AngularAop.factory('execute', ['$q', function ($q) {
 
         var slice = Array.prototype.slice;
 
@@ -14,11 +14,11 @@ var AngularAop = angular.module('AngularAOP', []);
 
         Advice.prototype.getAdvice = function () {
             var self = this;
-            return function (jp) {
+            return function (jp, pattern) {
                 if (typeof jp === 'function') {
                     return self._getFunctionAdvice(jp);
                 } else if (jp) {
-                    return self._getObjectAdvice(jp);
+                    return self._getObjectAdvice(jp, pattern);
                 }
             };
         };
@@ -32,10 +32,12 @@ var AngularAop = angular.module('AngularAOP', []);
             };
         };
 
-        Advice.prototype._getObjectAdvice = function (obj) {
+        Advice.prototype._getObjectAdvice = function (obj, pattern) {
+            pattern = pattern || /.*/;
             for (var prop in obj) {
                 if (obj.hasOwnProperty(prop) &&
-                    typeof obj[prop] === 'function') {
+                    typeof obj[prop] === 'function' &&
+                    pattern.test(prop)) {
                     obj[prop] = this._getFunctionAdvice(obj[prop]);
                 }
             }
@@ -164,7 +166,7 @@ var AngularAop = angular.module('AngularAOP', []);
          *
          * @constructor
          * @private
-         * @param {Function} aspect The join point to which the advice should be applied
+         * @param {Function} aspect The functionality which should be applied at the point.
          */
         function AdviceCollection(aspect) {
             this.before = new Before(aspect).getAdvice();
