@@ -38,12 +38,14 @@ var AngularAop = angular.module('AngularAOP', []);
         };
 
         Advice.prototype._getFunctionAdvice = function (method) {
-            var self = this;
-            return function () {
-                var args = slice.call(arguments);
-                args = [this, method].concat(args);
-                return self._wrapper.apply(self, args);
-            };
+            var self = this,
+                wrapper = function $angularAOPWrapper() {
+                    var args = slice.call(arguments);
+                    args = [this, method].concat(args);
+                    return self._wrapper.apply(self, args);
+                };
+            wrapper.originalMethod = method;
+            return wrapper;
         };
 
         Advice.prototype._getObjectAdvice = function (obj, rules) {
@@ -60,34 +62,39 @@ var AngularAop = angular.module('AngularAOP', []);
         Advice.prototype._matchRules = function (obj, prop, rules) {
             var methodPattern = rules.methodPattern || defaultRule,
                 argsPatterns = rules.argsPatterns || [],
-                tokens = this._parseMethod(obj, prop),
+                method = obj[prop],
+                tokens = this._parseMethod(method, prop),
                 passed = true;
-            if (methodPattern.test(tokens.method)) {
-                tokens.args.forEach(function (arg, idx) {
-                    var rule = argsPatterns[idx] || defaultRule;
-                    if (!rule.test(arg)) {
-                        passed = false;
-                        return;
-                    }
-                });
-            } else {
-                passed = false;
+            while (tokens.name === '$angularAOPWrapper') {
+                method = obj[prop].originalMethod;
+                tokens = this._parseMethod(method, prop);
             }
+            return methodPattern.test(tokens.method) && this._matchArguments(argsPatterns, tokens);
+        };
+
+        Advice.prototype._matchArguments = function (argsPatterns, tokens) {
+            var passed = true;
+            tokens.args.forEach(function (arg, idx) {
+                var rule = argsPatterns[idx] || defaultRule;
+                if (!rule.test(arg)) {
+                    passed = false;
+                    return;
+                }
+            });
             return passed;
         };
 
-        Advice.prototype._parseMethod = function (obj, prop) {
-            var result = {
-                    method: prop
-                },
-                parts = obj[prop].toString().match(/function\s*\(([^\)]+)/);
-            if (parts && parts[1]) {
-                result.args = parts[1].split(',').map(function (arg) {
+        Advice.prototype._parseMethod = function (method, prop) {
+            var result = { method: prop },
+                parts = method.toString().match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
+            if (parts && parts[2]) {
+                result.args = parts[2].split(',').map(function (arg) {
                     return arg.trim();
                 });
             } else {
                 result.args = [];
             }
+            result.name = parts[1];
             return result;
         };
 

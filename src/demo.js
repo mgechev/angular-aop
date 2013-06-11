@@ -1,16 +1,14 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('LoginCtrl', function ($scope, LoginService) {
-    LoginService.register('Register', 'method');
-    LoginService.login('Login', 'method');
-    LoginService.logout('Logout', 'method');
-    LoginService.loadUser();
+    LoginService.loadUser('Data');
+    LoginService.login('demouser', 'demopass');
 });
 
 DemoApp.factory('LoginService', function ($q, $rootScope, execute, Logger) {
     var username, password,
         api = {
-            loadUser: execute(Logger).onResolveOf(function () {
+            loadUser: execute(Logger).onResolveOf(function (test) {
                 var deferred = $q.defer();
                 setTimeout(function () {
                     $rootScope.$apply(function () {
@@ -22,7 +20,7 @@ DemoApp.factory('LoginService', function ($q, $rootScope, execute, Logger) {
                 }, 500);
                 return deferred.promise;
             }),
-            register: function (user, pass) {
+            register: function (test, user, pass) {
                 throw Error('register is not implemented');
             },
             login: function (user, pass) {
@@ -35,11 +33,8 @@ DemoApp.factory('LoginService', function ($q, $rootScope, execute, Logger) {
             }
         };
         api = execute(Logger).after(api, {
-            methodPattern: /^l/,
-            argsPatterns: [/^user/, /^pass$/]
-        });
-        api = execute(Logger).onThrowOf(api, {
-            methodPattern: /^reg/
+            methodPattern: /(loadUser|login)$/,
+            argsPatterns: [/^user$/, /^pass$/]
         });
     return api;
 });
