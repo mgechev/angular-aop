@@ -149,7 +149,8 @@ We can achieve the same effect as in the code above just by applying `Authorizat
         methodPattern: /Special|getArticleById/
     }));
 
-This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/`.
+This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/` and an `Error` is thrown the `Logger` will log it with detailed information.
+Notice that `onThrowOf`, `before` and all the methods listed bellow returns object with the same methods so chaining is possible.
 We can also match the methods not only by its names but also by its arguments:
 
 
@@ -162,13 +163,13 @@ Now the aspects will be applied only to the methods which match both the `method
 
 Currently `execute` supports the following pointcuts:
 
-* before - executes given service before the matched methods are invoked.
-* after - executes given service after the matched methods are invoked.
-* around - executes given service before and after the matched methods are invoked.
-* onThrowOf - executes when an `Error` is thrown by method from the given set of matched methods.
-* onResolveOf - executes after promise returned by a method from the given set of matched method is resolved but before the resolve callback is invoked.
-* afterResolveOf - executes after promise returned by a method from the given set of matched method is resolved but after the resolve callback is invoked.
-* onRejectOf - executes after promise returned by a method from the given set of matched method is rejected.
+* `before` - executes given service before the matched methods are invoked.
+* `after` - executes given service after the matched methods are invoked.
+* `around` - executes given service before and after the matched methods are invoked.
+* `onThrowOf` - executes when an `Error` is thrown by method from the given set of matched methods.
+* `onResolveOf` - executes after promise returned by a method from the given set of matched method is resolved but before the resolve callback is invoked.
+* `afterResolveOf` - executes after promise returned by a method from the given set of matched method is resolved but after the resolve callback is invoked.
+* `onRejectOf` - executes after promise returned by a method from the given set of matched method is rejected.
 
 Aspects can be applied not only to objects but also to functions:
 
