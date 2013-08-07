@@ -1,6 +1,7 @@
-var AngularAop = angular.module('AngularAOP', []);
-
 (function (undef) {
+
+    var AngularAop = angular.module('AngularAOP', []);
+
     /**
      * Service which give access to the pointcuts.
      */
