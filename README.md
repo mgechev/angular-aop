@@ -35,10 +35,10 @@ The definition of that service doesn't differ from the usual service definition.
 Let's look closer to the `args` argument of the logging service.
 It has few properties which we use for logging:
 
-    * exception - `Error` object thrown inside the method to which the aspect was applied.
-    * method - The name of the method to which the aspect was applied.
-    * when - When the advice was applied i.e. when the actual logging was occurred.
-    * arguments - The arguments of the method to which the advice was applied.
+* exception - `Error` object thrown inside the method to which the aspect was applied.
+* method - The name of the method to which the aspect was applied.
+* when - When the advice was applied i.e. when the actual logging was occurred.
+* arguments - The arguments of the method to which the advice was applied.
 
 Let's look in one more declaration of aspect:
 
@@ -162,13 +162,13 @@ Now the aspects will be applied only to the methods which match both the `method
 
 Currently `execute` supports the following pointcuts:
 
-    * before - executes given service before the matched methods are invoked.
-    * after - executes given service after the matched methods are invoked.
-    * around - executes given service before and after the matched methods are invoked.
-    * onThrowOf - executes when an `Error` is thrown by method from the given set of matched methods.
-    * onResolveOf - executes after promise returned by a method from the given set of matched method is resolved but before the resolve callback is invoked.
-    * afterResolveOf - executes after promise returned by a method from the given set of matched method is resolved but after the resolve callback is invoked.
-    * onRejectOf - executes after promise returned by a method from the given set of matched method is rejected.
+* before - executes given service before the matched methods are invoked.
+* after - executes given service after the matched methods are invoked.
+* around - executes given service before and after the matched methods are invoked.
+* onThrowOf - executes when an `Error` is thrown by method from the given set of matched methods.
+* onResolveOf - executes after promise returned by a method from the given set of matched method is resolved but before the resolve callback is invoked.
+* afterResolveOf - executes after promise returned by a method from the given set of matched method is resolved but after the resolve callback is invoked.
+* onRejectOf - executes after promise returned by a method from the given set of matched method is rejected.
 
 Aspects can be applied not only to objects but also to functions:
 
