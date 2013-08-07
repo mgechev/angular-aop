@@ -178,3 +178,8 @@ Aspects can be applied not only to objects but also to functions:
             //body
         });
     });
+
+License
+=======
+
+AngularAOP is distributed under the terms of the MIT license.
