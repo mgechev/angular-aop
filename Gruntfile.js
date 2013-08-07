@@ -1,9 +1,9 @@
-module.export = function (grunt) {
+module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.initConfig({
-        pgk: grunt.file.readJSON('package.json'),
+        pkg: grunt.file.readJSON('package.json'),
         uglify: {
             dist: {
                 files: {
@@ -13,5 +13,5 @@ module.export = function (grunt) {
         }
     });
 
-    grunt.registerTask('default', ['uglify']);
+    grunt.registerTask('default', 'uglify');
 };
