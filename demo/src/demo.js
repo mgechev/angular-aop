@@ -28,7 +28,7 @@ DemoApp.factory('Logger', function () {
             }
         });
         var throwData = (args.exception) ? ' and threw: ' + args.exception.message : '';
-        console.log('Method: ' + args.method + ', ' + args.name + ', with arguments: ' +
+        console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
                     angular.toJson(args.args) + throwData);
     };
 });

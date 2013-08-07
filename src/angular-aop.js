@@ -1,4 +1,4 @@
-(function (undef) {
+;(function (undef) {
 
     var AngularAop = angular.module('AngularAOP', []);
 
@@ -27,8 +27,8 @@
             //Default regular expression for matching arguments and method names
             defaultRule = /.*/;
 
-            //Defines all advice types
-            ADVICE_TYPES = {
+            //Defines all joint points
+            POINTCUTS = {
                 BEFORE: 'Before',
                 AFTER: 'After',
                 AROUND: 'Around',
@@ -38,38 +38,38 @@
                 ON_REJECT: 'OnReject'
             },
 
-            //Contains all advices
-            Advices = {},
+            //Contains all aspects (pointcut + advice)
+            Aspects = {},
 
-            //Builds specified advice
-            AdviceBuilder = {
-                buildAdvice: function (aspect, adviceType) {
+            //Builds specified aspect
+            AspectBuilder = {
+                buildAspect: function (advice, pointcut) {
                     var self = this;
                     return function (jp, rules) {
                         if (typeof jp === 'function') {
-                            return self._getFunctionAdvice(jp, adviceType, aspect);
+                            return self._getFunctionAspect(jp, pointcut, advice);
                         } else if (jp) {
-                            return self._getObjectAdvice(jp, rules || {}, adviceType, aspect);
+                            return self._getObjectAspect(jp, rules || {}, pointcut, advice);
                         }
                     };
                 },
-                _getFunctionAdvice: function (method, adviceType, aspect) {
-                    var advice = new Advices[adviceType](aspect);
-                        wrapper = function $angularAOPWrapper() {
+                _getFunctionAspect: function (method, pointcut, advice) {
+                    var aspect = new Aspects[pointcut](advice);
+                        wrapper = function __angularAOPWrapper__() {
                             var args = slice.call(arguments);
                             args = [this, method].concat(args);
-                            return advice._wrapper.apply(advice, args);
+                            return aspect._wrapper.apply(aspect, args);
                         };
                     wrapper.originalMethod = method;
-                    advice.setAdvice(wrapper);
+                    aspect.setWrapper(wrapper);
                     return wrapper;
                 },
-                _getObjectAdvice: function (obj, rules, adviceType, aspect) {
+                _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
                         if (obj.hasOwnProperty(prop) &&
                             typeof obj[prop] === 'function' &&
                             this._matchRules(obj, prop, rules)) {
-                            obj[prop] = this._getFunctionAdvice(obj[prop], adviceType, aspect);
+                            obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice);
                         }
                     }
                     return obj;
@@ -80,7 +80,7 @@
                         method = obj[prop],
                         tokens = this._parseMethod(method, prop),
                         passed = true;
-                    while (tokens.name === '$angularAOPWrapper') {
+                    while (tokens.when === '__angularAOPWrapper__') {
                         method = method.originalMethod;
                         tokens = this._parseMethod(method, prop);
                     }
@@ -107,51 +107,51 @@
                     } else {
                         result.args = [];
                     }
-                    result.name = parts[1];
+                    result.when = parts[1];
                     return result;
                 }
             };
 
 
 
-        function Advice(aspect) {
-            this._aspect = aspect;
-            this._advice = null;
+        function Aspect(advice) {
+            this._advice = advice;
+            this._wrapperFunc = null;
         }
 
-        Advice.prototype.setAdvice = function (advice) {
-            this._advice = advice;
+        Aspect.prototype.setWrapper = function (w) {
+            this._wrapperFunc = w;
         };
 
-        Advice.prototype._wrapper = function () {
+        Aspect.prototype._wrapper = function () {
             throw 'Not implemented';
         };
 
-        Advice.prototype.invoke = function (context, args, extraParams) {
+        Aspect.prototype.invoke = function (context, args, extraParams) {
             var method,
                 params = angular.extend({}, extraParams),
-                advice = this._advice;
-            while (advice.originalMethod)
-                advice = advice.originalMethod;
+                wrapper = this._wrapperFunc;
+            while (wrapper.originalMethod)
+                wrapper = wrapper.originalMethod;
             for (var prop in context) {
                 var temp = context[prop];
                 while (temp.originalMethod)
                     temp = temp.originalMethod;
-                if (temp === advice)
+                if (temp === wrapper)
                     method = prop;
             }
-            params.name = this.name;
+            params.when = this.when;
             params.method = method;
             params.args = args;
-            return this._aspect.call(context, params);
+            return this._advice.call(context, params);
         };
 
-        Advices[ADVICE_TYPES.BEFORE] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'before';
+        Aspects[POINTCUTS.BEFORE] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'before';
         };
-        Advices[ADVICE_TYPES.BEFORE].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.BEFORE].prototype._wrapper = function () {
+        Aspects[POINTCUTS.BEFORE].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.BEFORE].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift();
@@ -159,63 +159,63 @@
             return method.apply(context, args);
         };
 
-        Advices[ADVICE_TYPES.AFTER] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'after';
+        Aspects[POINTCUTS.AFTER] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'after';
         };
-        Advices[ADVICE_TYPES.AFTER].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.AFTER].prototype._wrapper = function () {
+        Aspects[POINTCUTS.AFTER].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.AFTER].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
                 result = method.apply(context, args),
-                aspectArgs = [result];
-            this.invoke(context, aspectArgs.concat(args));
+                adviceArgs = [result];
+            this.invoke(context, adviceArgs.concat(args));
             return result;
         };
 
-        Advices[ADVICE_TYPES.AROUND] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'around';
+        Aspects[POINTCUTS.AROUND] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'around';
         };
-        Advices[ADVICE_TYPES.AROUND].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.AROUND].prototype._wrapper = function () {
+        Aspects[POINTCUTS.AROUND].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.AROUND].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
-                aspectArgs, result;
+                adviceArgs, result;
             this.invoke(context, args);
             result = method.apply(context, args);
-            aspectArgs = [result];
-            this.invoke(context, aspectArgs.concat(args));
+            adviceArgs = [result];
+            this.invoke(context, adviceArgs.concat(args));
             return result;
         };
 
-        Advices[ADVICE_TYPES.ON_THROW] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'onThrow';
+        Aspects[POINTCUTS.ON_THROW] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'onThrow';
         };
-        Advices[ADVICE_TYPES.ON_THROW].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.ON_THROW].prototype._wrapper = function () {
+        Aspects[POINTCUTS.ON_THROW].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.ON_THROW].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
-                aspectArgs = args,
+                adviceArgs = args,
                 result;
             try {
                 result = method.call(context, args);
             } catch (e) {
-                this.invoke(context, aspectArgs, { exception: e });
+                this.invoke(context, adviceArgs, { exception: e });
             }
             return result;
         };
 
-        Advices[ADVICE_TYPES.ON_RESOLVE] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'onResolve';
+        Aspects[POINTCUTS.ON_RESOLVE] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'onResolve';
         };
-        Advices[ADVICE_TYPES.ON_RESOLVE].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.ON_RESOLVE].prototype._wrapper = function () {
+        Aspects[POINTCUTS.ON_RESOLVE].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.ON_RESOLVE].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
@@ -227,12 +227,12 @@
             return promise;
         };
 
-        Advices[ADVICE_TYPES.AFTER_RESOLVE] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'afterResolve';
+        Aspects[POINTCUTS.AFTER_RESOLVE] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'afterResolve';
         };
-        Advices[ADVICE_TYPES.AFTER_RESOLVE].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.AFTER_RESOLVE].prototype._wrapper = function () {
+        Aspects[POINTCUTS.AFTER_RESOLVE].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.AFTER_RESOLVE].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
@@ -250,12 +250,12 @@
             return innerPromise;
         };
 
-        Advices[ADVICE_TYPES.ON_REJECT] = function () {
-            Advice.apply(this, arguments);
-            this.name = 'onReject';
+        Aspects[POINTCUTS.ON_REJECT] = function () {
+            Aspect.apply(this, arguments);
+            this.when = 'onReject';
         };
-        Advices[ADVICE_TYPES.ON_REJECT].prototype = Object.create(Advice.prototype);
-        Advices[ADVICE_TYPES.ON_REJECT].prototype._wrapper = function () {
+        Aspects[POINTCUTS.ON_REJECT].prototype = Object.create(Aspect.prototype);
+        Aspects[POINTCUTS.ON_REJECT].prototype._wrapper = function () {
             var args = slice.call(arguments),
                 context = args.shift(),
                 method = args.shift(),
@@ -274,17 +274,17 @@
          * @private
          * @param {Function} aspect The join point to which the advice should be applied
          */
-        function AdviceCollection(aspect) {
-            this.before = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.BEFORE);
-            this.after = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.AFTER);
-            this.onThrowOf = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.ON_THROW);
-            this.onResolveOf = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.ON_RESOLVE);
-            this.afterResolveOf = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.AFTER_RESOLVE);
-            this.onRejectOf = AdviceBuilder.buildAdvice(aspect, ADVICE_TYPES.ON_REJECT);
+        function AspectCollection(aspect) {
+            this.before = AspectBuilder.buildAspect(aspect, POINTCUTS.BEFORE);
+            this.after = AspectBuilder.buildAspect(aspect, POINTCUTS.AFTER);
+            this.onThrowOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_THROW);
+            this.onResolveOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_RESOLVE);
+            this.afterResolveOf = AspectBuilder.buildAspect(aspect, POINTCUTS.AFTER_RESOLVE);
+            this.onRejectOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_REJECT);
         }
 
         return function (aspect) {
-            return new AdviceCollection(aspect);
+            return new AspectCollection(aspect);
         };
     }]);
 
