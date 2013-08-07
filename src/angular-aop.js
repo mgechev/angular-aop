@@ -277,6 +277,7 @@
         function AspectCollection(advice) {
             this.before = AspectBuilder.buildAspect(advice, POINTCUTS.BEFORE);
             this.after = AspectBuilder.buildAspect(advice, POINTCUTS.AFTER);
+            this.around = AspectBuilder.buildAspect(advice, POINTCUTS.AROUND);
             this.onThrowOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_THROW);
             this.onResolveOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_RESOLVE);
             this.afterResolveOf = AspectBuilder.buildAspect(advice, POINTCUTS.AFTER_RESOLVE);

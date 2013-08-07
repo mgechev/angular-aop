@@ -1,10 +1,10 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection) {
+    ArticlesCollection.getSpecialArticles();
     ArticlesCollection.loadArticles().then(function () {
         try {
             var article = ArticlesCollection.getArticleById(0);
-            ArticlesCollection.getSpecialArticles();
         } catch (e) {
             console.error(e.message);
         }
@@ -56,45 +56,33 @@ DemoApp.service('User', function () {
 
 DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
 
-    var articles = null,
+    var sampleArticles = [
+            { id: 0, title: 'Title 1', content: 'Content 1' },
+            { id: 1, title: 'Title 2', content: 'Content 2' },
+            { id: 2, title: 'Title 3', content: 'Content 3' }
+        ],
+        privateArticles = [
+            { id: 3, title: 'Title 4', content: 'Content 4' },
+            { id: 4, title: 'Title 5', content: 'Content 5' }
+        ],
         api = {
             loadArticles: function () {
                 var deferred = $q.defer();
                 $timeout(function () {
-                    articles = [
-                    {
-                        id: 0,
-                        title: 'Title 1',
-                        content: 'Content 1'
-                    },
-                    {
-                        id: 1,
-                        title: 'Title 2',
-                        content: 'Content 2'
-                    },
-                    {
-                        id: 2,
-                        title: 'Title 3',
-                        content: 'Content 3'
-                    }
-                    ];
-                    deferred.resolve(articles);
+                    deferred.resolve(sampleArticles);
                 }, 1000);
                 return deferred.promise;
             },
             getArticleById: function (id) {
-                for (var i = 0; i < articles.length; i += 1) {
-                    if (articles[i].id === id)  {
-                        return articles[i];
+                for (var i = 0; i < sampleArticles.length; i += 1) {
+                    if (sampleArticles[i].id === id)  {
+                        return sampleArticles[i];
                     }
                 }
                 return undefined;
             },
             getSpecialArticles: function () {
-                return [
-                { id: 3, title: 'Title 4', content: 'Content 4' },
-                { id: 4, title: 'Title 5', content: 'Content 5' }
-                ];
+                return privateArticles;
             }
         };
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
