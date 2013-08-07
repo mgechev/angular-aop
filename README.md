@@ -2,9 +2,9 @@ AngularAOP
 ===========
 
 *AngularAOP* is simple framework for Aspect-Oriented Programming with AngularJS.
-AOP fits great with Angular because of the framework architecture and solves many cross-cutting concerns.
+AOP fits great with AngularJS because of the framework architecture and also because it solves many cross-cutting concerns.
 
-AngularAOP allows use of different aspects on a single method of given service or applying given aspect to all service's methods.
+AngularAOP allows the usage of different aspects on a single method of given service or applying given aspect to all service's methods.
 
 More for the Aspect-Oriented Programming can be read from the links bellow in the reference section.
 
@@ -15,7 +15,7 @@ For using AngularAOP you need to load the `AngularAOP` module:
 
     angular.module('myModule', ['AngularAOP']);
 
-Your cross-cutting concerns can be defined in separate services. For example here is definition of a logging service which logs the method calls and thrown exception:
+Your cross-cutting concerns can be defined in separate services. For example here is a definition of logging service which logs the method calls and thrown exception:
 
     DemoApp.factory('Logger', function () {
         return function (args) {
@@ -32,7 +32,7 @@ Your cross-cutting concerns can be defined in separate services. For example her
 
 The definition of that service doesn't differ from the usual service definition.
 
-Let's look closer to the `args` argument of the logging service.
+Let's look closer at the `args` argument of the logging service.
 It has few properties which we use for logging:
 
 * exception - `Error` object thrown inside the method to which the aspect was applied.
@@ -40,7 +40,7 @@ It has few properties which we use for logging:
 * when - When the advice was applied i.e. when the actual logging was occurred.
 * arguments - The arguments of the method to which the advice was applied.
 
-Let's look in one more declaration of aspect:
+Let's look at one more declaration of aspect:
 
     DemoApp.factory('Authorization', function (User) {
         return function () {
@@ -51,7 +51,7 @@ Let's look in one more declaration of aspect:
         };
     });
 
-This is another common example for using AOP - authorization. The given service just checks whether user's user name and password are equals to respectively `foo` and `bar` if they are not equals to these values the service throws an `Error('Not authorized')`.
+This is another common example for using AOP - authorization. The given service just checks whether user's user name and password are equal respectively to `foo` and `bar`, if they are not equal to these values the service throws an `Error('Not authorized')`.
 
 We may want to apply authorization for reading news:
 
@@ -92,7 +92,7 @@ We may want to apply authorization for reading news:
 This is simple service which contains two kinds of articles (simple object literals): `sampleArticles` and `privateArticles`.
 The `api` object is the actual service public interface.
 
-We may want to apply authorization to the private articles, before the `getPrivateArticles` method return it's result.
+We may want to apply authorization to the private articles, before the `getPrivateArticles` method return its result.
 The usual way to do it is:
 
     getPrivateArticles: function () {
@@ -141,7 +141,7 @@ We have two duplicate lines of code. At this moment it's not a big deal but we m
     }
     //...
 
-Now we have a lot of duplicates and we we want to change something in the code which authorize the user and log the error we should change it in both places. We may have service with large interface which require logging and authorization (or something else) in all it's methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.
+Now we have a lot of duplicates and we we want to change something in the code which authorizes the user and logs the error we should change it in both places. We may have service with large interface which requires logging and authorization (or something else) in all of its methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.
 
 We can achieve the same effect as in the code above just by applying `Authorization` and `Logger` service to the `api` object:
 
@@ -150,8 +150,8 @@ We can achieve the same effect as in the code above just by applying `Authorizat
     }));
 
 This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/` and an `Error` is thrown the `Logger` will log it with detailed information.
-Notice that `onThrowOf`, `before` and all the methods listed bellow returns object with the same methods so chaining is possible.
-We can also match the methods not only by its names but also by its arguments:
+Notice that `onThrowOf`, `before` and all the methods listed bellow return object with the same methods so chaining is possible.
+We can also match the methods not only by their names but also by their arguments:
 
 
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
@@ -167,9 +167,9 @@ Currently `execute` supports the following pointcuts:
 * `after` - executes given service after the matched methods are invoked.
 * `around` - executes given service before and after the matched methods are invoked.
 * `onThrowOf` - executes when an `Error` is thrown by method from the given set of matched methods.
-* `onResolveOf` - executes after promise returned by a method from the given set of matched method is resolved but before the resolve callback is invoked.
-* `afterResolveOf` - executes after promise returned by a method from the given set of matched method is resolved but after the resolve callback is invoked.
-* `onRejectOf` - executes after promise returned by a method from the given set of matched method is rejected.
+* `onResolveOf` - executes after promise returned by a method from the given set of matched methods is resolved but before the resolve callback is invoked.
+* `afterResolveOf` - executes after promise returned by a method from the given set of matched methods is resolved but after the resolve callback is invoked.
+* `onRejectOf` - executes after promise returned by a method from the given set of matched methods is rejected.
 
 Aspects can be applied not only to objects but also to functions:
 
@@ -178,4 +178,3 @@ Aspects can be applied not only to objects but also to functions:
             //body
         });
     });
-
