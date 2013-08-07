@@ -272,19 +272,19 @@
          *
          * @constructor
          * @private
-         * @param {Function} aspect The join point to which the advice should be applied
+         * @param {Function} advice The advice which should be applied in the specified joint-point(s)
          */
-        function AspectCollection(aspect) {
-            this.before = AspectBuilder.buildAspect(aspect, POINTCUTS.BEFORE);
-            this.after = AspectBuilder.buildAspect(aspect, POINTCUTS.AFTER);
-            this.onThrowOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_THROW);
-            this.onResolveOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_RESOLVE);
-            this.afterResolveOf = AspectBuilder.buildAspect(aspect, POINTCUTS.AFTER_RESOLVE);
-            this.onRejectOf = AspectBuilder.buildAspect(aspect, POINTCUTS.ON_REJECT);
+        function AspectCollection(advice) {
+            this.before = AspectBuilder.buildAspect(advice, POINTCUTS.BEFORE);
+            this.after = AspectBuilder.buildAspect(advice, POINTCUTS.AFTER);
+            this.onThrowOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_THROW);
+            this.onResolveOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_RESOLVE);
+            this.afterResolveOf = AspectBuilder.buildAspect(advice, POINTCUTS.AFTER_RESOLVE);
+            this.onRejectOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_REJECT);
         }
 
-        return function (aspect) {
-            return new AspectCollection(aspect);
+        return function (advice) {
+            return new AspectCollection(advice);
         };
     }]);
 

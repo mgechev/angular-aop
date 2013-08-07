@@ -4,6 +4,7 @@ DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection) {
     ArticlesCollection.loadArticles().then(function () {
         try {
             var article = ArticlesCollection.getArticleById(0);
+            ArticlesCollection.getSpecialArticles();
         } catch (e) {
             console.error(e.message);
         }
@@ -21,12 +22,10 @@ DemoApp.factory('Authorization', function (User) {
 
 DemoApp.factory('Logger', function () {
     return function (args) {
-        args.args.forEach(function (arg, idx) {
-            if (arg instanceof Error) {
-                console.log('%cException: ' + arg.message, 'color: red; text-weight: bold; font-size: 1.2em;');
-                args.args.splice(idx, 1);
-            }
-        });
+        if (args.exception) {
+            console.log('%cException: ' + args.exception.message + '. ' + args.method + ' called before proper authorization.',
+            'color: red; text-weight: bold; font-size: 1.2em;');
+        }
         var throwData = (args.exception) ? ' and threw: ' + args.exception.message : '';
         console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
                     angular.toJson(args.args) + throwData);
@@ -84,17 +83,21 @@ DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, A
                 return deferred.promise;
             },
             getArticleById: function (id) {
-                var articles = this._articles;
                 for (var i = 0; i < articles.length; i += 1) {
                     if (articles[i].id === id)  {
                         return articles[i];
                     }
                 }
                 return undefined;
+            },
+            getSpecialArticles: function () {
+                return [
+                { id: 3, title: 'Title 4', content: 'Content 4' },
+                { id: 4, title: 'Title 5', content: 'Content 5' }
+                ];
             }
         };
-    execute(Logger).before(api);
-    execute(Logger).after(api);
-    execute(Logger).onThrowOf(api);
-    return api;
+    return execute(Logger).onThrowOf(execute(Authorization).before(api, {
+        methodPattern: /Special/
+    }));
 });
