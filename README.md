@@ -35,10 +35,10 @@ The definition of that service doesn't differ from the usual service definition.
 Let's look closer at the `args` argument of the logging service.
 It has few properties which we use for logging:
 
-* exception - `Error` object thrown inside the method to which the aspect was applied.
-* method - The name of the method to which the aspect was applied.
-* when - When the advice was applied i.e. when the actual logging was occurred.
-* arguments - The arguments of the method to which the advice was applied.
+* `exception` - `Error` object thrown inside the method to which the aspect was applied.
+* `method` - The name of the method to which the aspect was applied.
+* `when` - When the advice was applied i.e. when the actual logging was occurred.
+* `arguments` - The arguments of the method to which the advice was applied.
 
 Let's look at one more declaration of aspect:
 
