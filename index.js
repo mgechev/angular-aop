@@ -1,2 +1,2 @@
 "require angular"
-"require github://mgechev/angular-aop/src/angular-aop.js"
+"require ./src/angular-aop.js"
