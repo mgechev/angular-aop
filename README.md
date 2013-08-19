@@ -8,6 +8,13 @@ AngularAOP allows the usage of different aspects on a single method of given ser
 
 More for the Aspect-Oriented Programming can be read from the links bellow in the reference section.
 
+
+Online demo
+============
+
+If you prefer learning by doing (trial and error), come [right this way](http://plnkr.co/edit/bA2A4FfnwTf1hZeGQvvc?p=preview).
+
+
 Usage
 ======
 
