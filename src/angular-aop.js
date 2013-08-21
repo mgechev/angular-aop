@@ -53,8 +53,8 @@
                         }
                     };
                 },
-                _getFunctionAspect: function (method, pointcut, advice) {
-                    var aspect = new Aspects[pointcut](advice);
+                _getFunctionAspect: function (method, pointcut, advice, methodName) {
+                    var aspect = new Aspects[pointcut](advice, methodName);
                         var wrapper = function __angularAOPWrapper__() {
                             var args = slice.call(arguments);
                             args = [this, method].concat(args);
@@ -69,7 +69,7 @@
                         if (obj.hasOwnProperty(prop) &&
                             typeof obj[prop] === 'function' && obj[prop] != null &&
                             this._matchRules(obj, prop, rules)) {
-                            obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice);
+                            obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice, prop);
                         }
                     }
                     return obj;
@@ -114,9 +114,10 @@
 
 
 
-        function Aspect(advice) {
+        function Aspect(advice, methodName) {
             this._advice = advice;
             this._wrapperFunc = null;
+            this._methodName = methodName;
         }
 
         Aspect.prototype.setWrapper = function (w) {
@@ -128,24 +129,34 @@
         };
 
         Aspect.prototype.invoke = function (context, args, extraParams) {
-            var method,
-                params = angular.extend({}, extraParams),
-                wrapper = this._wrapperFunc;
-            while (wrapper.originalMethod)
-                wrapper = wrapper.originalMethod;
-            for (var prop in context) {
-                var temp = context[prop];
-                while (temp && temp.originalMethod)
-                    temp = temp.originalMethod;
-                if (temp === wrapper) {
-                    method = prop;
-                    break;
-                }
+            var params = angular.extend({}, extraParams),
+                methodName = this._methodName;
+            
+            if (!methodName) {
+                methodName = searchContextForMethodName.call(this);
             }
+
             params.when = this.when;
-            params.method = method;
+            params.method = methodName;
             params.args = args;
             return this._advice.call(context, params);
+            
+            function searchContextForMethodName() {
+                var wrapper = this._wrapperFunc,
+                    method = undefined;
+                while (wrapper.originalMethod)
+                    wrapper = wrapper.originalMethod;
+                for (var prop in context) {
+                    var temp = context[prop];
+                    while (temp && temp.originalMethod)
+                        temp = temp.originalMethod;
+                    if (temp === wrapper) {
+                        method = prop;
+                        break;
+                    }
+                }
+                return method;
+            }
         };
 
         Aspects[POINTCUTS.BEFORE] = function () {
