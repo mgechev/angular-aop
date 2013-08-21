@@ -173,7 +173,7 @@ Currently `execute` supports the following pointcuts:
 
 Aspects can be applied not only to objects but also to functions:
 
-    DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
+    DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
         return execute(Logger).before(function () {
             //body
         });
