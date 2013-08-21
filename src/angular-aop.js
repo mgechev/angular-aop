@@ -55,7 +55,7 @@
                 },
                 _getFunctionAspect: function (method, pointcut, advice) {
                     var aspect = new Aspects[pointcut](advice);
-                        wrapper = function __angularAOPWrapper__() {
+                        var wrapper = function __angularAOPWrapper__() {
                             var args = slice.call(arguments);
                             args = [this, method].concat(args);
                             return aspect._wrapper.apply(aspect, args);
@@ -67,7 +67,7 @@
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
                         if (obj.hasOwnProperty(prop) &&
-                            typeof obj[prop] === 'function' &&
+                            typeof obj[prop] === 'function' && obj[prop] != null &&
                             this._matchRules(obj, prop, rules)) {
                             obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice);
                         }
@@ -135,10 +135,12 @@
                 wrapper = wrapper.originalMethod;
             for (var prop in context) {
                 var temp = context[prop];
-                while (temp.originalMethod)
+                while (temp && temp.originalMethod)
                     temp = temp.originalMethod;
-                if (temp === wrapper)
+                if (temp === wrapper) {
                     method = prop;
+                    break;
+                }
             }
             params.when = this.when;
             params.method = method;
@@ -203,7 +205,7 @@
                 adviceArgs = args,
                 result;
             try {
-                result = method.call(context, args);
+                result = method.apply(context, args);
             } catch (e) {
                 this.invoke(context, adviceArgs, { exception: e });
             }
@@ -221,9 +223,11 @@
                 method = args.shift(),
                 promise = method.apply(context, args),
                 self = this;
-            promise.then(function () {
-                self.invoke(context, slice.call(arguments));
-            });
+            if (promise) {
+                promise.then(function () {
+                    self.invoke(context, slice.call(arguments));
+                });
+            }
             return promise;
         };
 
@@ -261,9 +265,11 @@
                 method = args.shift(),
                 promise = method.apply(context, args),
                 self = this;
-            promise.then(undef, function () {
-                self.invoke(context, slice.call(arguments));
-            });
+            if (promise) {
+                promise.then(undef, function () {
+                    self.invoke(context, slice.call(arguments));
+                });
+            }
             return promise;
         };
 
