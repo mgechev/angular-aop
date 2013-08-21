@@ -1,6 +1,7 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection) {
+//    ArticlesCollection();
     ArticlesCollection.getSpecialArticles();
     ArticlesCollection.loadArticles().then(function () {
         try {
@@ -54,7 +55,7 @@ DemoApp.service('User', function () {
     };
 });
 
-DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
+DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
 
     var sampleArticles = [
             { id: 0, title: 'Title 1', content: 'Content 1' },
@@ -85,6 +86,9 @@ DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, A
                 return privateArticles;
             }
         };
+//    return execute(Logger).after(function () {
+//        console.log('before');
+//    });
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
         methodPattern: /Special/
     }));

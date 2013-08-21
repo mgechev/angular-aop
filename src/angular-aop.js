@@ -53,23 +53,27 @@
                         }
                     };
                 },
-                _getFunctionAspect: function (method, pointcut, advice) {
-                    var aspect = new Aspects[pointcut](advice);
+                _getFunctionAspect: function (method, pointcut, advice, methodName) {
+                    methodName = methodName || this._getMethodName(method);
+                    var aspect = new Aspects[pointcut](advice),
                         wrapper = function __angularAOPWrapper__() {
                             var args = slice.call(arguments);
-                            args = [this, method].concat(args);
+                            args = [this, method, methodName].concat(args);
                             return aspect._wrapper.apply(aspect, args);
                         };
                     wrapper.originalMethod = method;
                     aspect.setWrapper(wrapper);
                     return wrapper;
                 },
+                _getMethodName: function (method) {
+                    return (/function\s+(.*?)\(/).exec(method.toString())[1];
+                },
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
                         if (obj.hasOwnProperty(prop) &&
                             typeof obj[prop] === 'function' &&
                             this._matchRules(obj, prop, rules)) {
-                            obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice);
+                            obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice, prop);
                         }
                     }
                     return obj;
@@ -130,18 +134,10 @@
         Aspect.prototype.invoke = function (context, args, extraParams) {
             var method,
                 params = angular.extend({}, extraParams),
-                wrapper = this._wrapperFunc;
-            while (wrapper.originalMethod)
-                wrapper = wrapper.originalMethod;
-            for (var prop in context) {
-                var temp = context[prop];
-                while (temp.originalMethod)
-                    temp = temp.originalMethod;
-                if (temp === wrapper)
-                    method = prop;
-            }
+                wrapper = this._wrapperFunc,
+                methodName = args.shift();
             params.when = this.when;
-            params.method = method;
+            params.method = methodName;
             params.args = args;
             return this._advice.call(context, params);
         };
@@ -170,7 +166,7 @@
                 method = args.shift(),
                 result = method.apply(context, args),
                 adviceArgs = [result];
-            this.invoke(context, adviceArgs.concat(args));
+            this.invoke(context, args.concat(adviceArgs));
             return result;
         };
 
