@@ -71,7 +71,7 @@
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
                         if (obj.hasOwnProperty(prop) &&
-                            typeof obj[prop] === 'function' && obj[prop] != null &&
+                            typeof obj[prop] === 'function' &&
                             this._matchRules(obj, prop, rules)) {
                             obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice, prop);
                         }
@@ -118,10 +118,9 @@
 
 
 
-        function Aspect(advice, methodName) {
+        function Aspect(advice) {
             this._advice = advice;
             this._wrapperFunc = null;
-            this._methodName = methodName;
         }
 
         Aspect.prototype.setWrapper = function (w) {
