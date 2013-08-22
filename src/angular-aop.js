@@ -71,7 +71,7 @@
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
                         if (obj.hasOwnProperty(prop) &&
-                            typeof obj[prop] === 'function' &&
+                            typeof obj[prop] === 'function' && obj[prop] != null &&
                             this._matchRules(obj, prop, rules)) {
                             obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice, prop);
                         }
@@ -118,9 +118,10 @@
 
 
 
-        function Aspect(advice) {
+        function Aspect(advice, methodName) {
             this._advice = advice;
             this._wrapperFunc = null;
+            this._methodName = methodName;
         }
 
         Aspect.prototype.setWrapper = function (w) {
@@ -199,7 +200,7 @@
                 adviceArgs = args,
                 result;
             try {
-                result = method.call(context, args);
+                result = method.apply(context, args);
             } catch (e) {
                 this.invoke(context, adviceArgs, { exception: e });
             }
@@ -217,9 +218,11 @@
                 method = args.shift(),
                 promise = method.apply(context, args),
                 self = this;
-            promise.then(function () {
-                self.invoke(context, slice.call(arguments));
-            });
+            if (promise) {
+                promise.then(function () {
+                    self.invoke(context, slice.call(arguments));
+                });
+            }
             return promise;
         };
 
@@ -257,9 +260,11 @@
                 method = args.shift(),
                 promise = method.apply(context, args),
                 self = this;
-            promise.then(undef, function () {
-                self.invoke(context, slice.call(arguments));
-            });
+            if (promise) {
+                promise.then(undef, function () {
+                    self.invoke(context, slice.call(arguments));
+                });
+            }
             return promise;
         };
 
