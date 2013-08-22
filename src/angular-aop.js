@@ -66,7 +66,7 @@
                     return wrapper;
                 },
                 _getMethodName: function (method) {
-                    return (/function\s+(.*?)\(/).exec(method.toString())[1];
+                    return (/function\s+(.*?)\s*\(/).exec(method.toString())[1];
                 },
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
                     for (var prop in obj) {
