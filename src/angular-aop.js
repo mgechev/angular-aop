@@ -58,14 +58,21 @@
                     var aspect = new Aspects[pointcut](advice),
                         wrapper = function __angularAOPWrapper__() {
                             var args = slice.call(arguments);
-                            args = [this, method, methodName].concat(args);
-                            return aspect._wrapper.apply(aspect, args);
+                            args = {
+                                args: args,
+                                context: this,
+                                method: method,
+                                methodName: methodName
+                            };
+                            return aspect._wrapper.call(aspect, args);
                         };
                     wrapper.originalMethod = method;
                     aspect.setWrapper(wrapper);
                     return wrapper;
                 },
                 _getMethodName: function (method) {
+                    while (method.originalMethod)
+                        method = method.originalMethod;
                     return (/function\s+(.*?)\s*\(/).exec(method.toString())[1];
                 },
                 _getObjectAspect: function (obj, rules, pointcut, advice) {
@@ -131,15 +138,17 @@
             throw 'Not implemented';
         };
 
-        Aspect.prototype.invoke = function (context, args, extraParams) {
-            var method,
-                params = angular.extend({}, extraParams),
-                wrapper = this._wrapperFunc,
-                methodName = args.shift();
-            params.when = this.when;
-            params.method = methodName;
-            params.args = args;
-            return this._advice.call(context, params);
+        Aspect.prototype.invoke = function (params) {
+            var wrapper = this._wrapperFunc,
+                adviceArgs = {};
+            adviceArgs.when = this.when;
+            adviceArgs.method = params.methodName;
+            adviceArgs.args = params.args;
+            adviceArgs.exception = params.exception;
+            adviceArgs.result = params.result;
+            adviceArgs.resolveArgs = params.resolveArgs;
+            adviceArgs.rejectArgs = params.rejectArgs;
+            return this._advice.call(params.context, adviceArgs);
         };
 
         Aspects[POINTCUTS.BEFORE] = function () {
@@ -147,12 +156,9 @@
             this.when = 'before';
         };
         Aspects[POINTCUTS.BEFORE].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.BEFORE].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift();
-            this.invoke(context, args);
-            return method.apply(context, args);
+        Aspects[POINTCUTS.BEFORE].prototype._wrapper = function (params) {
+            this.invoke(params);
+            return params.method.apply(params.context, params.args);
         };
 
         Aspects[POINTCUTS.AFTER] = function () {
@@ -160,13 +166,11 @@
             this.when = 'after';
         };
         Aspects[POINTCUTS.AFTER].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.AFTER].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
-                result = method.apply(context, args),
-                adviceArgs = [result];
-            this.invoke(context, args.concat(adviceArgs));
+        Aspects[POINTCUTS.AFTER].prototype._wrapper = function (params) {
+            var context = params.context,
+                result = params.method.apply(context, params.args);
+            params.result = result;
+            this.invoke(params);
             return result;
         };
 
@@ -175,15 +179,15 @@
             this.when = 'around';
         };
         Aspects[POINTCUTS.AROUND].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.AROUND].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
-                adviceArgs, result;
-            this.invoke(context, args);
+        Aspects[POINTCUTS.AROUND].prototype._wrapper = function (params) {
+            var args = params.args,
+                context = params.context,
+                method = params.method,
+                result;
+            this.invoke(params);
             result = method.apply(context, args);
-            adviceArgs = [result];
-            this.invoke(context, adviceArgs.concat(args));
+            params.result = result;
+            this.invoke(params);
             return result;
         };
 
@@ -192,16 +196,14 @@
             this.when = 'onThrow';
         };
         Aspects[POINTCUTS.ON_THROW].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.ON_THROW].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
-                adviceArgs = args,
+        Aspects[POINTCUTS.ON_THROW].prototype._wrapper = function (params) {
+            var args = params.args,
                 result;
             try {
-                result = method.apply(context, args);
+                result = params.method.apply(params.context, args);
             } catch (e) {
-                this.invoke(context, adviceArgs, { exception: e });
+                params.exception = e;
+                this.invoke(params);
             }
             return result;
         };
@@ -211,15 +213,16 @@
             this.when = 'onResolve';
         };
         Aspects[POINTCUTS.ON_RESOLVE].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.ON_RESOLVE].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
+        Aspects[POINTCUTS.ON_RESOLVE].prototype._wrapper = function (params) {
+            var args = params.args,
+                context = params.context,
+                method = params.method,
                 promise = method.apply(context, args),
                 self = this;
             if (promise) {
                 promise.then(function () {
-                    self.invoke(context, slice.call(arguments));
+                    params.resolveArgs = arguments;
+                    self.invoke(params);
                 });
             }
             return promise;
@@ -230,20 +233,22 @@
             this.when = 'afterResolve';
         };
         Aspects[POINTCUTS.AFTER_RESOLVE].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.AFTER_RESOLVE].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
+        Aspects[POINTCUTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
+            var args = params.args, 
+                context = params.context, 
+                method = params.method,
                 deferred = $q.defer(),
                 innerPromise = deferred.promise,
                 promise = method.apply(context, args),
                 self = this;
             promise.then(function () {
-                var callbackArgs = slice.call(arguments);
+                params.resolveArgs = arguments;
                 innerPromise.then(function () {
-                    self.invoke(context, callbackArgs);
+                    self.invoke(params);
                 });
-                deferred.resolve();
+                deferred.resolve.apply(deferred, arguments);
+            }, function () {
+                deferred.reject.apply(innerPromise, arguments);
             });
             return innerPromise;
         };
@@ -253,15 +258,16 @@
             this.when = 'onReject';
         };
         Aspects[POINTCUTS.ON_REJECT].prototype = Object.create(Aspect.prototype);
-        Aspects[POINTCUTS.ON_REJECT].prototype._wrapper = function () {
-            var args = slice.call(arguments),
-                context = args.shift(),
-                method = args.shift(),
+        Aspects[POINTCUTS.ON_REJECT].prototype._wrapper = function (params) {
+            var args = params.args,
+                context = params.context,
+                method = params.method,
                 promise = method.apply(context, args),
                 self = this;
             if (promise) {
                 promise.then(undef, function () {
-                    self.invoke(context, slice.call(arguments));
+                    params.rejectArgs = arguments;
+                    self.invoke(params);
                 });
             }
             return promise;
