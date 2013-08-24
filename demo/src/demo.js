@@ -1,20 +1,14 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
 DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection) {
-    ArticlesCollection.foo()
-    .then(function (arg) {
-        console.log('resolved', arg);
-    }, function () {
-        console.log('rejected');
+    ArticlesCollection.getSpecialArticles();
+    ArticlesCollection.loadArticles().then(function () {
+        try {
+            var article = ArticlesCollection.getArticleById(0);
+        } catch (e) {
+            console.error(e.message);
+        }
     });
-//    ArticlesCollection.getSpecialArticles();
-//    ArticlesCollection.loadArticles().then(function () {
-//        try {
-//            var article = ArticlesCollection.getArticleById(0);
-//        } catch (e) {
-//            console.error(e.message);
-//        }
-//    });
 });
 
 DemoApp.factory('Authorization', function (User) {
@@ -92,28 +86,7 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
                 return privateArticles;
             }
         };
-    var api2 = {
-        foo: function () {
-            var deferred = $q.defer();
-            console.log('Inside the function');
-            $timeout(function () {
-                deferred.reject('Message');
-            }, 1000);
-            return deferred.promise;
-        },
-        bar: function () {
-            console.log('bar');
-        }
-    };
-    api2 = execute(Logger).onThrowOf(api2);
-    api2 = execute(Logger).around(api2, {
-        methodPattern: /^f/
-    });
-    api2 = execute(Logger).afterResolveOf(api2);
-    api2 = execute(Logger).onRejectOf(api2);
-    api2 = execute(Logger).after(api2);
-    return api2;
-//    return execute(Logger).onThrowOf(execute(Authorization).before(api, {
-//        methodPattern: /Special/
-//    }));
+    return execute(Logger).onThrowOf(execute(Authorization).before(api, {
+        methodPattern: /Special/
+    }));
 });
