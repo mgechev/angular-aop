@@ -86,6 +86,9 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
                 return privateArticles;
             }
         };
+    //Adding two aspects:
+    //1). Authorization advice with before joint point
+    //2). Logger advice with onThrow joint point
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
         methodPattern: /Special/
     }));
