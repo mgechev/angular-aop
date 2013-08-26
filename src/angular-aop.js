@@ -219,7 +219,7 @@
                 method = params.method,
                 promise = method.apply(context, args),
                 self = this;
-            if (promise && promise.then) {
+            if (promise && typeof promise.then === 'function') {
                 promise.then(function () {
                     params.resolveArgs = arguments;
                     self.invoke(params);
@@ -264,7 +264,7 @@
                 method = params.method,
                 promise = method.apply(context, args),
                 self = this;
-            if (promise && promise.then) {
+            if (promise && typeof promise.then === 'function') {
                 promise.then(undef, function () {
                     params.rejectArgs = arguments;
                     self.invoke(params);
