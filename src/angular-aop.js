@@ -98,6 +98,7 @@
                     return methodPattern.test(tokens.method) && this._matchArguments(argsPatterns, tokens);
                 },
                 _matchArguments: function (argsPatterns, tokens) {
+                    if (tokens.args.length < argsPatterns.length) return false;
                     var passed = true;
                     angular.forEach(tokens.args, function (arg, idx) {
                         var rule = argsPatterns[idx] || defaultRule;
@@ -112,8 +113,9 @@
                     var result = { method: prop },
                         parts = method.toString().match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
                     if (parts && parts[2]) {
-                        result.args = parts[2].split(',').map(function (arg) { //TODO to not use map
-                            return trim.call(arg);
+                        result.args = [];
+                        angular.forEach(parts[2].split(','), function (arg) { //TODO to not use map
+                            result.args.push(trim.call(arg));
                         });
                     } else {
                         result.args = [];
