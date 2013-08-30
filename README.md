@@ -152,7 +152,7 @@ We have two duplicate lines of code. At this moment it's not a big deal but we m
     }
     //...
 
-Now we have a lot of duplicates and we we want to change something in the code which authorizes the user and logs the error we should change it in both places. We may have service with large interface which requires logging and authorization (or something else) in all of its methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.
+Now we have a lot of duplicates and if we want to change something in the code which authorizes the user and logs the error we should change it in both places. We may have service with large interface which requires logging and authorization (or something else) in all of its methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.
 
 We can achieve the same effect as in the code above just by applying `Authorization` and `Logger` service to the `api` object:
 
@@ -160,7 +160,7 @@ We can achieve the same effect as in the code above just by applying `Authorizat
         methodPattern: /Special|getArticleById/
     }));
 
-This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/` and an `Error` is thrown the `Logger` will log it with detailed information.
+This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/` when an `Error` is thrown the `Logger` will log it with detailed information.
 Notice that `onThrowOf`, `before` and all the methods listed bellow return object with the same methods so chaining is possible.
 We can also match the methods not only by their names but also by their arguments:
 
