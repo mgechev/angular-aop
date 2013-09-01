@@ -167,7 +167,7 @@ We can also match the methods not only by their names but also by their argument
 
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
         methodPattern: /Special|getArticleById/,
-        argsPatterns: [/^user$, /^[Ii]d(_num)?$/]
+        argsPatterns: [/^user$/, /^[Ii]d(_num)?$/]
     }));
 
 Now the aspects will be applied only to the methods which match both the `methodPattern` and `argsPatterns` rules.
