@@ -1,9 +1,7 @@
 DemoApp = angular.module('DemoApp', ['AngularAOP']);
 
-DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection, User) {
-  User.setUsername('foo');
-  User.setPassword('bar');
-  ArticlesCollection.getSpecialArticles(1,2,3,4,5);
+DemoApp.controller('ArticlesListCtrl', function ($scope, ArticlesCollection) {
+  ArticlesCollection.getSpecialArticles();
   ArticlesCollection.loadArticles().then(function () {
     try {
       var article = ArticlesCollection.getArticleById(0);
@@ -28,7 +26,6 @@ DemoApp.factory('Logger', function () {
       console.log('%cException: ' + args.exception.message + '. ' + args.method + ' called before proper authorization.',
       'color: red; text-weight: bold; font-size: 1.2em;');
     }
-    args.args = [2,3,4];
     var throwData = (args.exception) ? ' and threw: ' + args.exception.message : '';
     console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
           angular.toJson(args.args) + throwData + ' and resolve data: ' +
@@ -86,14 +83,13 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
         return undefined;
       },
       getSpecialArticles: function () {
-        console.log(arguments);
         return privateArticles;
       }
     };
   //Adding two aspects:
   //1). Authorization advice with before joint point
   //2). Logger advice with onThrow joint point
-  return execute(Logger).before(execute(Authorization).before(api, {
+  return execute(Logger).onThrowOf(execute(Authorization).before(api, {
     methodPattern: /Special/
   }));
 });
