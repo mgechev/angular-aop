@@ -172,8 +172,7 @@
       var context = params.context,
         result = params.method.apply(context, params.args);
       params.result = result;
-      this.invoke(params);
-      return result;
+      return this.invoke(params).result || result;
     };
 
     Aspects[POINTCUTS.AROUND] = function () {
@@ -188,8 +187,7 @@
         result;
       result = method.apply(context, this.invoke(params).args);
       params.result = result;
-      this.invoke(params);
-      return result;
+      return this.invoke(params).result || result;
     };
 
     Aspects[POINTCUTS.ON_THROW] = function () {
