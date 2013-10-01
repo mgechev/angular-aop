@@ -142,15 +142,16 @@
 
     Aspect.prototype.invoke = function (params) {
       var wrapper = this._wrapperFunc,
-        adviceArgs = {};
-      adviceArgs.when = this.when;
-      adviceArgs.method = params.methodName;
-      adviceArgs.args = params.args;
-      adviceArgs.exception = params.exception;
-      adviceArgs.result = params.result;
-      adviceArgs.resolveArgs = params.resolveArgs;
-      adviceArgs.rejectArgs = params.rejectArgs;
-      return this._advice.call(params.context, adviceArgs);
+        aspectData = {};
+      aspectData.when = this.when;
+      aspectData.method = params.methodName;
+      aspectData.args = params.args;
+      aspectData.exception = params.exception;
+      aspectData.result = params.result;
+      aspectData.resolveArgs = params.resolveArgs;
+      aspectData.rejectArgs = params.rejectArgs;
+      aspectData.result = this._advice.call(params.context, aspectData);
+      return aspectData;
     };
 
     Aspects[POINTCUTS.BEFORE] = function () {
@@ -159,8 +160,7 @@
     };
     Aspects[POINTCUTS.BEFORE].prototype = Object.create(Aspect.prototype);
     Aspects[POINTCUTS.BEFORE].prototype._wrapper = function (params) {
-      this.invoke(params);
-      return params.method.apply(params.context, params.args);
+      return params.method.apply(params.context, this.invoke(params).args);
     };
 
     Aspects[POINTCUTS.AFTER] = function () {
