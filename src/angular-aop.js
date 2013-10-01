@@ -186,8 +186,7 @@
         context = params.context,
         method = params.method,
         result;
-      this.invoke(params);
-      result = method.apply(context, args);
+      result = method.apply(context, this.invoke(params).args);
       params.result = result;
       this.invoke(params);
       return result;
