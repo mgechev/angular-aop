@@ -112,11 +112,11 @@
         _parseMethod: function (method, prop) {
           var result = { method: prop },
               parts = method.toString()
-                .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')
+                .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '') //stripping the comments
                 .match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
           if (parts && parts[2]) {
             result.args = [];
-            angular.forEach(parts[2].split(','), function (arg) { //TODO to not use map
+            angular.forEach(parts[2].split(','), function (arg) {
               result.args.push(trim.call(arg));
             });
           } else {
