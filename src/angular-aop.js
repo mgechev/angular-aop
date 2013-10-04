@@ -111,7 +111,9 @@
         },
         _parseMethod: function (method, prop) {
           var result = { method: prop },
-            parts = method.toString().match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
+              parts = method.toString()
+                .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')
+                .match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
           if (parts && parts[2]) {
             result.args = [];
             angular.forEach(parts[2].split(','), function (arg) { //TODO to not use map
