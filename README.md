@@ -25,16 +25,16 @@ For using AngularAOP you need to load the `AngularAOP` module:
 Your cross-cutting concerns can be defined in separate services. For example here is a definition of logging service which logs the method calls and thrown exception:
 
     DemoApp.factory('Logger', function () {
-        return function (args) {
-            if (args.exception) {
-                console.log('%cException: ' + args.exception.message + '. '
-                    + args.method + ' called before proper authorization.',
-                    'color: red; text-weight: bold; font-size: 1.2em;');
-            }
-            var throwData = (args.exception) ? ' and threw: ' + args.exception.message : '';
-            console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
-                        angular.toJson(args.args) + throwData);
-        };
+      return function (args) {
+        if (args.exception) {
+          console.log('%cException: ' + args.exception.message + '. '
+              + args.method + ' called before proper authorization.',
+              'color: red; text-weight: bold; font-size: 1.2em;');
+        }
+        var throwData = (args.exception) ? ' and threw: ' + args.exception.message : '';
+        console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
+               angular.toJson(args.args) + throwData);
+      };
     });
 
 The definition of that service doesn't differ from the usual service definition.
@@ -54,12 +54,12 @@ It has few properties which we use for logging:
 Let's look at one more declaration of aspect:
 
     DemoApp.factory('Authorization', function (User) {
-        return function () {
-            if (User.getUsername() !== 'foo' &&
-                User.getPassword() !== 'bar') {
-                throw new Error('Not authorized');
-            }
-        };
+      return function () {
+        if (User.getUsername() !== 'foo' &&
+            User.getPassword() !== 'bar') {
+          throw new Error('Not authorized');
+        }
+      };
     });
 
 This is another common example for using AOP - authorization. The given service just checks whether user's user name and password are equal respectively to `foo` and `bar`, if they are not equal to these values the service throws an `Error('Not authorized')`.
@@ -68,36 +68,36 @@ We may want to apply authorization for reading news:
 
     DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
 
-        var sampleArticles = [
-                { id: 0, title: 'Title 1', content: 'Content 1' },
-                { id: 1, title: 'Title 2', content: 'Content 2' },
-                { id: 2, title: 'Title 3', content: 'Content 3' }
-            ],
-            privateArticles = [
-                { id: 3, title: 'Title 4', content: 'Content 4' },
-                { id: 4, title: 'Title 5', content: 'Content 5' }
-            ],
-            api = {
-                loadArticles: function () {
-                    var deferred = $q.defer();
-                    $timeout(function () {
-                        deferred.resolve(sampleArticles);
-                    }, 1000);
-                    return deferred.promise;
-                },
-                getArticleById: function (id) {
-                    for (var i = 0; i < sampleArticles.length; i += 1) {
-                        if (sampleArticles[i].id === id)  {
-                            return sampleArticles[i];
-                        }
-                    }
-                    return undefined;
-                },
-                getPrivateArticles: function () {
-                    return privateArticles;
+      var sampleArticles = [
+          { id: 0, title: 'Title 1', content: 'Content 1' },
+          { id: 1, title: 'Title 2', content: 'Content 2' },
+          { id: 2, title: 'Title 3', content: 'Content 3' }
+        ],
+        privateArticles = [
+          { id: 3, title: 'Title 4', content: 'Content 4' },
+          { id: 4, title: 'Title 5', content: 'Content 5' }
+        ],
+        api = {
+          loadArticles: function () {
+            var deferred = $q.defer();
+            $timeout(function () {
+                deferred.resolve(sampleArticles);
+            }, 1000);
+            return deferred.promise;
+          },
+          getArticleById: function (id) {
+            for (var i = 0; i < sampleArticles.length; i += 1) {
+                if (sampleArticles[i].id === id)  {
+                    return sampleArticles[i];
                 }
-            };
-        return api;
+            }
+            return undefined;
+          },
+          getPrivateArticles: function () {
+            return privateArticles;
+          }
+        };
+      return api;
     });
 
 This is simple service which contains two kinds of articles (simple object literals): `sampleArticles` and `privateArticles`.
@@ -107,20 +107,20 @@ We may want to apply authorization to the private articles, before the `getPriva
 The usual way to do it is:
 
     getPrivateArticles: function () {
-        Authorization();
-        return privateArticles;
+      Authorization();
+      return privateArticles;
     }
 
 We may also want to apply authorization to the `getArticleById` method, so:
 
     getArticleById: function (id) {
-        Authorization();
-        for (var i = 0; i < sampleArticles.length; i += 1) {
-            if (sampleArticles[i].id === id)  {
-                return sampleArticles[i];
-            }
+      Authorization();
+      for (var i = 0; i < sampleArticles.length; i += 1) {
+        if (sampleArticles[i].id === id)  {
+          return sampleArticles[i];
         }
-        return undefined;
+      }
+      return undefined;
     }
 
 We have two duplicate lines of code. At this moment it's not a big deal but we may want to add logging and see special error message in the console when `Error` is thrown:
@@ -128,27 +128,27 @@ We have two duplicate lines of code. At this moment it's not a big deal but we m
 
     //...
     getPrivateArticles: function () {
-        try {
-            Authorization();
-            return privateArticles;
-        } catch (e) {
-            console.log('%cException: ' + e.message + '. getPrivateArticles called before proper authorization.',
-                'color: red; text-weight: bold; font-size: 1.2em;');
-        }
+      try {
+        Authorization();
+        return privateArticles;
+      } catch (e) {
+        console.log('%cException: ' + e.message + '. getPrivateArticles called before proper authorization.',
+            'color: red; text-weight: bold; font-size: 1.2em;');
+      }
     },
     getArticleById: function (id) {
-        try {
-            Authorization();
-            for (var i = 0; i < sampleArticles.length; i += 1) {
-                if (sampleArticles[i].id === id)  {
-                    return sampleArticles[i];
-                }
-            }
-        } catch (e) {
-            console.log('%cException: ' + e.message + '. getArticleById called before proper authorization.',
-                'color: red; text-weight: bold; font-size: 1.2em;');
+      try {
+        Authorization();
+        for (var i = 0; i < sampleArticles.length; i += 1) {
+          if (sampleArticles[i].id === id)  {
+            return sampleArticles[i];
+          }
         }
-        return undefined;
+      } catch (e) {
+         console.log('%cException: ' + e.message + '. getArticleById called before proper authorization.',
+            'color: red; text-weight: bold; font-size: 1.2em;');
+      }
+      return undefined;
     }
     //...
 
@@ -157,7 +157,7 @@ Now we have a lot of duplicates and if we want to change something in the code w
 We can achieve the same effect as in the code above just by applying `Authorization` and `Logger` service to the `api` object:
 
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
-        methodPattern: /Special|getArticleById/
+      methodPattern: /Special|getArticleById/
     }));
 
 This code will invoke the `Authorization` service before executing the methods which match the pattern: `/Special|getArticleById/` when an `Error` is thrown the `Logger` will log it with detailed information.
@@ -166,8 +166,8 @@ We can also match the methods not only by their names but also by their argument
 
 
     return execute(Logger).onThrowOf(execute(Authorization).before(api, {
-        methodPattern: /Special|getArticleById/,
-        argsPatterns: [/^user$/, /^[Ii]d(_num)?$/]
+      methodPattern: /Special|getArticleById/,
+      argsPatterns: [/^user$/, /^[Ii]d(_num)?$/]
     }));
 
 Now the aspects will be applied only to the methods which match both the `methodPattern` and `argsPatterns` rules.
@@ -185,9 +185,9 @@ Currently `execute` supports the following pointcuts:
 Aspects can be applied not only to objects but also to functions:
 
     DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
-        return execute(Logger).before(function () {
-            //body
-        });
+      return execute(Logger).before(function () {
+        //body
+      });
     });
 
 License
