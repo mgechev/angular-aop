@@ -6,7 +6,16 @@ AOP fits great with AngularJS because of the framework architecture and also bec
 
 AngularAOP allows the usage of different aspects on a single method of given service or applying given aspect to all service's methods.
 
-More for the Aspect-Oriented Programming can be read from the links bellow in the reference section.
+Few sample usages of AOP with AngularJS are:
+
+* Logging
+* Forcing authorization policies
+* Caching
+* Applying exception handling policies
+* Instrumentation to gather performance statistics
+* Retry logic, circuit breakers
+
+Some of these use cases are suggested by [Christian Crowhurst](https://github.com/christianacca).
 
 This micro-framework is only 1.5KB (minified and gzipped).
 
@@ -81,15 +90,15 @@ We may want to apply authorization for reading news:
           loadArticles: function () {
             var deferred = $q.defer();
             $timeout(function () {
-                deferred.resolve(sampleArticles);
+              deferred.resolve(sampleArticles);
             }, 1000);
             return deferred.promise;
           },
           getArticleById: function (id) {
             for (var i = 0; i < sampleArticles.length; i += 1) {
-                if (sampleArticles[i].id === id)  {
-                    return sampleArticles[i];
-                }
+              if (sampleArticles[i].id === id)  {
+                return sampleArticles[i];
+              }
             }
             return undefined;
           },
@@ -194,3 +203,4 @@ License
 =======
 
 AngularAOP is distributed under the terms of the MIT license.
+
