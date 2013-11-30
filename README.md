@@ -199,6 +199,16 @@ Aspects can be applied not only to objects but also to functions:
       });
     });
 
+
+Roadmap
+=======
+
+1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
+2. Declarative way for applying aspects to given services
+  - Use JSON or object literals in order to define which advice should be invoked in specific pointcuts and joint-points for given target service
+  - Use decorators to decorate the services
+
+
 License
 =======
 
