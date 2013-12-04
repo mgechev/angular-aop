@@ -1,4 +1,14 @@
-AngularAOP
+Table of Contents
+========
+* [About AngularAOP](#about-angularaop)
+* [Online demo](#online-demo)
+* [Usage](#usage)
+* [What's new](#whats-new)
+  * [v0.1.0](#v010)
+* [Roadmap](#roadmap)
+* [License](#license)
+
+About AngularAOP
 ===========
 
 *AngularAOP* is simple framework for Aspect-Oriented Programming with AngularJS.
@@ -218,7 +228,7 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
 });
 ```
 
-Whats new
+What's new
 =========
 
 ##v0.1.0
