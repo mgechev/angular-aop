@@ -303,6 +303,12 @@
       this.onRejectOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_REJECT);
     }
 
+    function applyAspects($provide, target, aspects) {
+      angular.forEach(aspects, function (aspect){
+        decorate($provide, target, aspect);
+      });
+    }
+
     function decorate($provide, target, annotation) {
       $provide.decorator(target, ['$q', '$injector', '$delegate', function ($q, $injector, $delegate) {
         var advice = (typeof annotation.advice === 'string') ? $injector.get(annotation.advice) : annotation.advice,
@@ -324,8 +330,13 @@
     return {
 
       annotate: function ($provide, annotations) {
+        var aspects;
         for (var target in annotations) {
-          decorate($provide, target, annotations[target]);
+          aspects = annotations[target];
+          if (!angular.isArray(aspects)) {
+            aspects = [aspects];
+          }
+          applyAspects($provide, target, aspects);
         }
       },
 

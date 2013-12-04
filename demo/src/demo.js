@@ -99,10 +99,13 @@ DemoApp.provider('ArticlesCollection', function () {
 
 DemoApp.config(function ($provide, executeProvider) {
   executeProvider.annotate($provide, {
-    ArticlesCollection: {
+    ArticlesCollection: [{
       jointPoint: 'before',
       advice: 'Logger',
       methodPattern: /Special/
-    }
+    },{
+      jointPoint: 'before',
+      advice: 'Logger'
+    }]
   });
 });
