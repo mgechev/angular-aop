@@ -1,3 +1,10 @@
+/**
+ * Framework for aspect-oriented programming with AngularJS
+ *
+ * @author Minko Gechev (@mgechev)
+ * @version 0.1.0
+ * @license http://opensource.org/licenses/MIT MIT
+ */
 ;(function (undef) {
 
   var AngularAop = angular.module('AngularAOP', []);

@@ -218,18 +218,34 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
 });
 ```
 
+Whats new
+=========
+
+##v0.1.0
+
+New way of annotating. Now you can annotate in your config callback:
+
+```js
+DemoApp.config(function ($provide, executeProvider) {
+  executeProvider.annotate($provide, {
+    ArticlesCollection: {
+      jointPoint: 'before',
+      advice: 'Logger',
+      methodPattern: /Special/,
+      argsPatterns: [/arg1/, /arg2/, ..., /argn/]
+    }
+  });
+});
+```
+
+**Note:** In this way you won't couple your target methods/objects with the aspect at all but your target service must be defined as provider.
 
 Roadmap
 =======
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
-2. Declarative way for applying aspects to given services
-  - Use JSON or object literals in order to define which advice should be invoked in specific pointcuts and joint-points for given target service
-  - Use decorators to decorate the services
-
 
 License
 =======
 
 AngularAOP is distributed under the terms of the MIT license.
-
