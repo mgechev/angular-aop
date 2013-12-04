@@ -33,7 +33,7 @@ This micro-framework is only 1.5KB (minified and gzipped).
 Online demo
 ============
 
-If you prefer learning by doing (trial and error), come [right this way](http://plnkr.co/edit/bA2A4FfnwTf1hZeGQvvc?p=preview).
+If you prefer learning by doing (trial and error), come [right this way](http://plnkr.co/edit/R9juR0oe4xT5AHQs5uDF?p=preview).
 
 Usage
 ======
