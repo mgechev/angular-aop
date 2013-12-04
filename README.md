@@ -5,6 +5,7 @@ Table of Contents
 * [Usage](#usage)
 * [What's new](#whats-new)
   * [v0.1.0](#v010)
+  * [v0.1.1](#v011)
 * [Roadmap](#roadmap)
 * [License](#license)
 
@@ -248,12 +249,34 @@ DemoApp.config(function ($provide, executeProvider) {
 });
 ```
 
+##v0.1.1
+
+Multiple aspects can be applied to single service through the new way of annotation:
+
+```js
+DemoApp.config(function ($provide, executeProvider) {
+  executeProvider.annotate($provide, {
+    ArticlesCollection: [{
+      jointPoint: 'before',
+      advice: 'Logger',
+    }, {
+      //aspect 2
+    }, {
+      //aspect 3
+    }, ... , {
+      //aspect n
+    }]
+  });
+});
+```
+
 **Note:** In this way you won't couple your target methods/objects with the aspect at all but your target service must be defined as provider.
 
 Roadmap
 =======
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
+2. Write solid amount of tests
 
 License
 =======
