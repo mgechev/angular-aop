@@ -5,9 +5,11 @@
   /**
    * Service which give access to the pointcuts.
    */
-  AngularAop.factory('execute', ['$q', function Base($q) {
+  AngularAop.provider('execute', function executeProvider() {
 
-    var slice = Array.prototype.slice,
+    var MaybeQ = null,
+
+      slice = Array.prototype.slice,
 
       //Cross-browser trim function
       trim = (function () {
@@ -45,11 +47,11 @@
       AspectBuilder = {
         buildAspect: function (advice, pointcut) {
           var self = this;
-          return function (jp, rules) {
-            if (typeof jp === 'function') {
-              return self._getFunctionAspect(jp, pointcut, advice);
-            } else if (jp) {
-              return self._getObjectAspect(jp, rules || {}, pointcut, advice);
+          return function (target, rules) {
+            if (typeof target === 'function') {
+              return self._getFunctionAspect(target, pointcut, advice);
+            } else if (target) {
+              return self._getObjectAspect(target, rules || {}, pointcut, advice);
             }
           };
         },
@@ -238,7 +240,7 @@
       var args = params.args,
         context = params.context,
         method = params.method,
-        deferred = $q.defer(),
+        deferred = MaybeQ.defer(),
         innerPromise = deferred.promise,
         promise = method.apply(context, args),
         self = this;
@@ -282,6 +284,9 @@
      * @param {Function} advice The advice which should be applied in the specified joint-point(s)
      */
     function AspectCollection(advice) {
+      if (typeof advice !== 'function') {
+        throw new Error('The advice should be a function');
+      }
       this.before = AspectBuilder.buildAspect(advice, POINTCUTS.BEFORE);
       this.after = AspectBuilder.buildAspect(advice, POINTCUTS.AFTER);
       this.around = AspectBuilder.buildAspect(advice, POINTCUTS.AROUND);
@@ -291,9 +296,40 @@
       this.onRejectOf = AspectBuilder.buildAspect(advice, POINTCUTS.ON_REJECT);
     }
 
-    return function (advice) {
-      return new AspectCollection(advice);
-    };
-  }]);
+    function decorate($provide, target, annotation) {
+      $provide.decorator(target, ['$q', '$injector', '$delegate', function ($q, $injector, $delegate) {
+        var advice = (typeof annotation.advice === 'string') ? $injector.get(annotation.advice) : annotation.advice,
+            jointPoint = annotation.jointPoint,
+            methodPattern = annotation.methodPattern,
+            argsPatterns = annotation.argsPattern,
+            aspect = new AspectCollection(advice);
+        MaybeQ = $q;
+        if (typeof aspect[jointPoint] !== 'function') {
+          throw new Error('No such joint-point ' + jointPoint);
+        }
+        return aspect[jointPoint]($delegate, {
+          methodPattern: methodPattern,
+          argsPatterns: argsPatterns
+        });
+      }]);
+    }
 
-}(undefined));
+    return {
+
+      annotate: function ($provide, annotations) {
+        for (var target in annotations) {
+          decorate($provide, target, annotations[target]);
+        }
+      },
+
+      $get: ['$q', function ($q) {
+        MaybeQ = $q;
+        return function (advice) {
+          return new AspectCollection(advice);
+        };
+      }]
+
+    };
+  });
+
+}());
