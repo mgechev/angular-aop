@@ -112,13 +112,10 @@ DemoApp.provider('ArticlesCollection', function () {
 
 DemoApp.config(function ($provide, executeProvider) {
   executeProvider.annotate($provide, {
-    ArticlesCollection: [{
-      jointPoint: 'before',
-      advice: 'Authorization',
+    'ArticlesCollection': [{
+      jointPoint: 'aroundAsync',
+      advice: 'LoggerAsync',
       methodPattern: /Special/
-    },{
-      jointPoint: 'onThrowOf',
-      advice: 'LoggerAsync'
     }]
   });
 });

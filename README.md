@@ -279,6 +279,7 @@ Roadmap
 2. Write solid amount of tests
 3. Support of asynchronous advices
 4. More flexible way of defining pointcuts (regexps?)
+5. To put all aspect definitions outside the local scope of the provider for easier testing
 
 License
 =======
