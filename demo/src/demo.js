@@ -38,6 +38,19 @@ DemoApp.provider('Logger', function () {
   }
 });
 
+
+DemoApp.provider('LoggerAsync', function () {
+  return {
+    $get: function ($timeout) {
+      return function (args) {
+        return $timeout(function () {
+          console.log('Async logger', args);
+        }, 1000);
+      };
+    }
+  }
+});
+
 DemoApp.service('User', function () {
 
   this._username = null;
@@ -101,11 +114,11 @@ DemoApp.config(function ($provide, executeProvider) {
   executeProvider.annotate($provide, {
     ArticlesCollection: [{
       jointPoint: 'before',
-      advice: 'Logger',
+      advice: 'Authorization',
       methodPattern: /Special/
     },{
-      jointPoint: 'before',
-      advice: 'Logger'
+      jointPoint: 'onThrowOf',
+      advice: 'LoggerAsync'
     }]
   });
 });

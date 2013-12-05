@@ -39,6 +39,7 @@
       //Defines all joint points
       JOINT_POINTS = {
         BEFORE: 'Before',
+        BEFORE_ASYNC: 'BeforeAsync',
         AFTER: 'After',
         AROUND: 'Around',
         ON_THROW: 'OnThrow',
@@ -52,19 +53,19 @@
 
       //Builds specified aspect
       AspectBuilder = {
-        buildAspect: function (advice, pointcut) {
+        buildAspect: function (advice, jointPoint) {
           var self = this;
           return function (target, rules) {
             if (typeof target === 'function') {
-              return self._getFunctionAspect(target, pointcut, advice);
+              return self._getFunctionAspect(target, jointPoint, advice);
             } else if (target) {
-              return self._getObjectAspect(target, rules || {}, pointcut, advice);
+              return self._getObjectAspect(target, rules || {}, jointPoint, advice);
             }
           };
         },
-        _getFunctionAspect: function (method, pointcut, advice, methodName) {
+        _getFunctionAspect: function (method, jointPoint, advice, methodName) {
           methodName = methodName || this._getMethodName(method);
-          var aspect = new Aspects[pointcut](advice),
+          var aspect = new Aspects[jointPoint](advice),
             wrapper = function __angularAOPWrapper__() {
               var args = slice.call(arguments);
               args = {
@@ -84,12 +85,12 @@
             method = method.originalMethod;
           return (/function\s+(.*?)\s*\(/).exec(method.toString())[1];
         },
-        _getObjectAspect: function (obj, rules, pointcut, advice) {
+        _getObjectAspect: function (obj, rules, jointPoint, advice) {
           for (var prop in obj) {
             if (obj.hasOwnProperty(prop) &&
               typeof obj[prop] === 'function' &&
               this._matchRules(obj, prop, rules)) {
-              obj[prop] = this._getFunctionAspect(obj[prop], pointcut, advice, prop);
+              obj[prop] = this._getFunctionAspect(obj[prop], jointPoint, advice, prop);
             }
           }
           return obj;
@@ -174,9 +175,36 @@
       return params.method.apply(params.context, this.invoke(params).args);
     };
 
+    Aspects[JOINT_POINTS.BEFORE_ASYNC] = function () {
+      Aspect.apply(this, arguments);
+      this.when = 'beforeAsync';
+    };
+    Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype._wrapper = function (params) {
+      var aspectData = this.invoke(params);
+      return aspectData.result
+      .then(function (result) {
+        return params.method.apply(params.context, aspectData.args);
+      }, function (error) {
+        return params.method.apply(params.context, aspectData.args);
+      });
+    };
+
     Aspects[JOINT_POINTS.AFTER] = function () {
       Aspect.apply(this, arguments);
       this.when = 'after';
+    };
+    Aspects[JOINT_POINTS.AFTER].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.AFTER].prototype._wrapper = function (params) {
+      var context = params.context,
+        result = params.method.apply(context, params.args);
+      params.result = result;
+      return this.invoke(params).result || result;
+    };
+
+    Aspects[JOINT_POINTS.AFTER] = function () {
+      Aspect.apply(this, arguments);
+      this.when = 'afterAsync';
     };
     Aspects[JOINT_POINTS.AFTER].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AFTER].prototype._wrapper = function (params) {
@@ -295,6 +323,7 @@
         throw new Error('The advice should be a function');
       }
       this.before = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
+      this.beforeAsync = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
       this.after = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
       this.around = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
       this.onThrowOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);

@@ -1,0 +1,25 @@
+{
+  "name": "angular-aop",
+  "main": "index.js",
+  "version": "0.1.1",
+  "homepage": "https://github.com/mgechev/angular-aop",
+  "authors": [
+    "mgechev <mgechev@gmail.com>"
+  ],
+  "description": "Micro-framework for aspect-oriented programming with AngularJS",
+  "keywords": [
+    "aspect-oriented",
+    "programming",
+    "aop",
+    "AngularJS"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ]
+}
