@@ -42,6 +42,7 @@
         BEFORE_ASYNC: 'BeforeAsync',
         AFTER: 'After',
         AROUND: 'Around',
+        AROUND_ASYNC: 'AroundAsync',
         ON_THROW: 'OnThrow',
         ON_RESOLVE: 'OnResolve',
         AFTER_RESOLVE: 'AfterResolve',
@@ -137,8 +138,6 @@
         }
       };
 
-
-
     function Aspect(advice) {
       this._advice = advice;
       this._wrapperFunc = null;
@@ -168,7 +167,7 @@
 
     Aspects[JOINT_POINTS.BEFORE] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'before';
+      this.when = JOINT_POINTS.BEFORE;
     };
     Aspects[JOINT_POINTS.BEFORE].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.BEFORE].prototype._wrapper = function (params) {
@@ -177,12 +176,12 @@
 
     Aspects[JOINT_POINTS.BEFORE_ASYNC] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'beforeAsync';
+      this.when = JOINT_POINTS.BEFORE_ASYNC;
     };
     Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype._wrapper = function (params) {
       var aspectData = this.invoke(params);
-      return aspectData.result
+      return MaybeQ.when(aspectData.result)
       .then(function (result) {
         return params.method.apply(params.context, aspectData.args);
       }, function (error) {
@@ -192,7 +191,7 @@
 
     Aspects[JOINT_POINTS.AFTER] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'after';
+      this.when = JOINT_POINTS.AFTER;
     };
     Aspects[JOINT_POINTS.AFTER].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AFTER].prototype._wrapper = function (params) {
@@ -204,7 +203,7 @@
 
     Aspects[JOINT_POINTS.AFTER] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'afterAsync';
+      this.when = JOINT_POINTS.AFTER;
     };
     Aspects[JOINT_POINTS.AFTER].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AFTER].prototype._wrapper = function (params) {
@@ -216,22 +215,43 @@
 
     Aspects[JOINT_POINTS.AROUND] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'around';
+      this.when = JOINT_POINTS.AROUND;
     };
     Aspects[JOINT_POINTS.AROUND].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AROUND].prototype._wrapper = function (params) {
       var args = params.args,
-        context = params.context,
-        method = params.method,
-        result;
+          context = params.context,
+          method = params.method,
+          result;
       result = method.apply(context, this.invoke(params).args);
       params.result = result;
       return this.invoke(params).result || result;
     };
 
+    Aspects[JOINT_POINTS.AROUND_ASYNC] = function () {
+      Aspect.apply(this, arguments);
+      this.when = JOINT_POINTS.AROUND_ASYNC;
+    };
+    Aspects[JOINT_POINTS.AROUND_ASYNC].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.AROUND_ASYNC].prototype._wrapper = function (params) {
+      var args = params.args,
+          context = params.context,
+          method = params.method,
+          aspectData = this.invoke(params),
+          self = this,
+          result;
+      function afterBefore() {
+        result = method.apply(context, aspectData.result);
+        params.result = result;
+        return self.invoke(params).result || result;
+      }
+      return MaybeQ.when(aspectData.result)
+      .then(afterBefore, afterBefore);
+    };
+
     Aspects[JOINT_POINTS.ON_THROW] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'onThrow';
+      this.when = JOINT_POINTS.ON_THROW;
     };
     Aspects[JOINT_POINTS.ON_THROW].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.ON_THROW].prototype._wrapper = function (params) {
@@ -248,15 +268,15 @@
 
     Aspects[JOINT_POINTS.ON_RESOLVE] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'onResolve';
+      this.when = JOINT_POINTS.ON_RESOLVE;
     };
     Aspects[JOINT_POINTS.ON_RESOLVE].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.ON_RESOLVE].prototype._wrapper = function (params) {
       var args = params.args,
-        context = params.context,
-        method = params.method,
-        promise = method.apply(context, args),
-        self = this;
+          context = params.context,
+          method = params.method,
+          promise = method.apply(context, args),
+          self = this;
       if (promise && typeof promise.then === 'function') {
         promise.then(function () {
           params.resolveArgs = arguments;
@@ -268,7 +288,7 @@
 
     Aspects[JOINT_POINTS.AFTER_RESOLVE] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'afterResolve';
+      this.when = JOINT_POINTS.AFTER_RESOLVE;
     };
     Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
@@ -293,7 +313,7 @@
 
     Aspects[JOINT_POINTS.ON_REJECT] = function () {
       Aspect.apply(this, arguments);
-      this.when = 'onReject';
+      this.when = JOINT_POINTS.ON_REJECT;
     };
     Aspects[JOINT_POINTS.ON_REJECT].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.ON_REJECT].prototype._wrapper = function (params) {
@@ -326,6 +346,7 @@
       this.beforeAsync = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
       this.after = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
       this.around = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
+      this.aroundAsync = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
       this.onThrowOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
       this.onResolveOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
       this.afterResolveOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
