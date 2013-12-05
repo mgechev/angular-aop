@@ -277,6 +277,8 @@ Roadmap
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
 2. Write solid amount of tests
+3. Support of asynchronous advices
+4. More flexible way of defining pointcuts (regexps?)
 
 License
 =======
