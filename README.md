@@ -3,7 +3,7 @@ Table of Contents
 * [About AngularAOP](#about-angularaop)
 * [Online demo](#online-demo)
 * [Usage](#usage)
-* [What's new](#whats-new)
+* [Change log](#change-log)
   * [v0.1.0](#v010)
   * [v0.1.1](#v011)
 * [Roadmap](#roadmap)
@@ -229,7 +229,7 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
 });
 ```
 
-What's new
+Change log
 =========
 
 ##v0.1.0
