@@ -3,6 +3,8 @@ Table of Contents
 * [About AngularAOP](#about-angularaop)
 * [Online demo](#online-demo)
 * [Usage](#usage)
+* [Known issues](#known-issues)
+  * [Circular dependency](circular-dependency)
 * [Change log](#change-log)
   * [v0.1.0](#v010)
   * [v0.1.1](#v011)
@@ -228,6 +230,14 @@ DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, A
   });
 });
 ```
+
+# Known issues
+
+## Circular dependency
+
+This is not issue in AngularAOP but something which should be considered when using Dependency Injection.
+
+Note that if the `$injector` tries to get a service that depends on itself, either directly or indirectly you will get error "Circular dependency". To fix this, construct your dependency chain such that there are no circular dependencies. Check the [following article](http://misko.hevery.com/2008/08/01/circular-dependency-in-constructors-and-dependency-injection/), it can give you a basic idea how to procceed.
 
 Change log
 =========
