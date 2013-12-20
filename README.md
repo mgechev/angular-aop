@@ -295,3 +295,7 @@ License
 =======
 
 AngularAOP is distributed under the terms of the MIT license.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/mgechev/angular-aop/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
