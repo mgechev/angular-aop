@@ -4,7 +4,7 @@ Table of Contents
 * [Online demo](#online-demo)
 * [Usage](#usage)
 * [Known issues](#known-issues)
-  * [Circular dependency](circular-dependency)
+  * [Circular dependency](#circular-dependency)
 * [Change log](#change-log)
   * [v0.1.0](#v010)
   * [v0.1.1](#v011)
