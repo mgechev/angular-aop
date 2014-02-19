@@ -27,6 +27,10 @@
   "maxlen": 80,
   "globals": {
     "angular": false,
-    "module": false
+    "module": false,
+    "Aspects": false,
+    "JOINT_POINTS": false,
+    "Aspect": false,
+    "MaybeQ": false
   }
 }
