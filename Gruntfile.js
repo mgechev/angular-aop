@@ -9,7 +9,14 @@ module.exports = function (grunt) {
     uglify: {
       dist: {
         files: {
-          'build/angular-aop.min.js': ['./src/angular-aop.js']
+          'build/angular-aop.min.js': [
+            './src/aspects/aspect.js',
+            './src/angular-aop.js',
+            './src/aspects/jointpoints/*.js'
+          ]
+        },
+        options: {
+          wrap: true
         }
       }
     }

@@ -11,6 +11,7 @@
   "quotmark": "single",
   "unused": true,
   "strict": true,
+  "globalstrict": true,
   "trailing": true,
   "smarttabs": true,
   "white": true,
@@ -25,6 +26,7 @@
   "maxcomplexity": 9,
   "maxlen": 80,
   "globals": {
-    "angular": false
+    "angular": false,
+    "module": false
   }
 }
