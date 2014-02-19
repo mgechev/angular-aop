@@ -5,7 +5,9 @@
  * @version 0.1.1
  * @license http://opensource.org/licenses/MIT MIT
  */
-;(function (undef) {
+(function (undef) {
+
+  'use strict';
 
   var AngularAop = angular.module('AngularAOP', []);
 
@@ -34,7 +36,7 @@
       }()),
 
       //Default regular expression for matching arguments and method names
-      defaultRule = /.*/;
+      defaultRule = /.*/,
 
       //Defines all joint points
       JOINT_POINTS = {
@@ -60,7 +62,8 @@
             if (typeof target === 'function') {
               return self._getFunctionAspect(target, jointPoint, advice);
             } else if (target) {
-              return self._getObjectAspect(target, rules || {}, jointPoint, advice);
+              return self._getObjectAspect(target, rules || {},
+                                           jointPoint, advice);
             }
           };
         },
@@ -82,8 +85,9 @@
           return wrapper;
         },
         _getMethodName: function (method) {
-          while (method.originalMethod)
+          while (method.originalMethod) {
             method = method.originalMethod;
+          }
           return (/function\s+(.*?)\s*\(/).exec(method.toString())[1];
         },
         _getObjectAspect: function (obj, rules, jointPoint, advice) {
@@ -91,7 +95,8 @@
             if (obj.hasOwnProperty(prop) &&
               typeof obj[prop] === 'function' &&
               this._matchRules(obj, prop, rules)) {
-              obj[prop] = this._getFunctionAspect(obj[prop], jointPoint, advice, prop);
+              obj[prop] =
+                this._getFunctionAspect(obj[prop], jointPoint, advice, prop);
             }
           }
           return obj;
@@ -100,16 +105,18 @@
           var methodPattern = rules.methodPattern || defaultRule,
             argsPatterns = rules.argsPatterns || [],
             method = obj[prop],
-            tokens = this._parseMethod(method, prop),
-            passed = true;
+            tokens = this._parseMethod(method, prop);
           while (tokens.when === '__angularAOPWrapper__') {
             method = method.originalMethod;
             tokens = this._parseMethod(method, prop);
           }
-          return methodPattern.test(tokens.method) && this._matchArguments(argsPatterns, tokens);
+          return methodPattern.test(tokens.method) &&
+                  this._matchArguments(argsPatterns, tokens);
         },
         _matchArguments: function (argsPatterns, tokens) {
-          if (tokens.args.length < argsPatterns.length) return false;
+          if (tokens.args.length < argsPatterns.length) {
+            return false;
+          }
           var passed = true;
           angular.forEach(tokens.args, function (arg, idx) {
             var rule = argsPatterns[idx] || defaultRule;
@@ -123,7 +130,8 @@
         _parseMethod: function (method, prop) {
           var result = { method: prop },
               parts = method.toString()
-                .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '') //stripping the comments
+                //stripping the comments
+                .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')
                 .match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
           if (parts && parts[2]) {
             result.args = [];
@@ -152,8 +160,7 @@
     };
 
     Aspect.prototype.invoke = function (params) {
-      var wrapper = this._wrapperFunc,
-        aspectData = {};
+      var aspectData = {};
       aspectData.when = this.when;
       aspectData.method = params.methodName;
       aspectData.args = params.args;
@@ -178,13 +185,14 @@
       Aspect.apply(this, arguments);
       this.when = JOINT_POINTS.BEFORE_ASYNC;
     };
-    Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype =
+          Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype._wrapper = function (params) {
       var aspectData = this.invoke(params);
       return MaybeQ.when(aspectData.result)
-      .then(function (result) {
+      .then(function () {
         return params.method.apply(params.context, aspectData.args);
-      }, function (error) {
+      }, function () {
         return params.method.apply(params.context, aspectData.args);
       });
     };
@@ -219,8 +227,7 @@
     };
     Aspects[JOINT_POINTS.AROUND].prototype = Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AROUND].prototype._wrapper = function (params) {
-      var args = params.args,
-          context = params.context,
+      var context = params.context,
           method = params.method,
           result;
       result = method.apply(context, this.invoke(params).args);
@@ -232,10 +239,10 @@
       Aspect.apply(this, arguments);
       this.when = JOINT_POINTS.AROUND_ASYNC;
     };
-    Aspects[JOINT_POINTS.AROUND_ASYNC].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.AROUND_ASYNC].prototype =
+          Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AROUND_ASYNC].prototype._wrapper = function (params) {
-      var args = params.args,
-          context = params.context,
+      var context = params.context,
           method = params.method,
           aspectData = this.invoke(params),
           self = this,
@@ -270,7 +277,8 @@
       Aspect.apply(this, arguments);
       this.when = JOINT_POINTS.ON_RESOLVE;
     };
-    Aspects[JOINT_POINTS.ON_RESOLVE].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.ON_RESOLVE].prototype =
+            Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.ON_RESOLVE].prototype._wrapper = function (params) {
       var args = params.args,
           context = params.context,
@@ -290,7 +298,8 @@
       Aspect.apply(this, arguments);
       this.when = JOINT_POINTS.AFTER_RESOLVE;
     };
-    Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype = Object.create(Aspect.prototype);
+    Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype =
+            Object.create(Aspect.prototype);
     Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
       var args = params.args,
         context = params.context,
@@ -336,32 +345,40 @@
      *
      * @constructor
      * @private
-     * @param {Function} advice The advice which should be applied in the specified joint-point(s)
+     * @param {Function} advice The advice which should be
+     *                          applied in the specified joint-point(s)
      */
     function AspectCollection(advice) {
       if (typeof advice !== 'function') {
         throw new Error('The advice should be a function');
       }
       this.before = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
-      this.beforeAsync = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
+      this.beforeAsync =
+          AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
       this.after = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
       this.around = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
-      this.aroundAsync = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
+      this.aroundAsync =
+          AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
       this.onThrowOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
-      this.onResolveOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
-      this.afterResolveOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
-      this.onRejectOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_REJECT);
+      this.onResolveOf =
+          AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
+      this.afterResolveOf =
+          AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
+      this.onRejectOf =
+          AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_REJECT);
     }
 
     function applyAspects($provide, target, aspects) {
-      angular.forEach(aspects, function (aspect){
+      angular.forEach(aspects, function (aspect) {
         decorate($provide, target, aspect);
       });
     }
 
     function decorate($provide, target, annotation) {
-      $provide.decorator(target, ['$q', '$injector', '$delegate', function ($q, $injector, $delegate) {
-        var advice = (typeof annotation.advice === 'string') ? $injector.get(annotation.advice) : annotation.advice,
+      $provide.decorator(target, ['$q', '$injector', '$delegate',
+              function ($q, $injector, $delegate) {
+        var advice = (typeof annotation.advice === 'string') ?
+                $injector.get(annotation.advice) : annotation.advice,
             jointPoint = annotation.jointPoint,
             methodPattern = annotation.methodPattern,
             argsPatterns = annotation.argsPattern,
