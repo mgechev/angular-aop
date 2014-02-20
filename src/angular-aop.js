@@ -1,3 +1,7 @@
+/* global Aspects     : true */
+/* global JOINT_POINTS: true */
+/* global MaybeQ      : true */
+
 /**
  * Framework for aspect-oriented programming with AngularJS
  *
