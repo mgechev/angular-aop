@@ -1,3 +1,5 @@
+/* global describe,it,expect */
+
 describe('Angular AOP', function () {
 
   'use strict';
@@ -10,7 +12,8 @@ describe('Angular AOP', function () {
     expect(typeof module).toBe('object');
   });
 
-  it('should define service called execute with dependencies in "ng"', function () {
+  it('should define service called execute with dependencies in "ng"',
+    function () {
     var injector = angular.injector(['ng', 'AngularAOP']),
         execute;
     expect(function () {
