@@ -1,7 +1,10 @@
 // Karma configuration
 // Generated on Wed Dec 25 2013 13:10:00 GMT+0200 (EET)
 
-module.exports = function(config) {
+module.exports = function (config) {
+
+  'use strict';
+
   config.set({
 
     // base path, that will be used to resolve files and exclude
@@ -21,7 +24,7 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      
+
     ],
 
 
@@ -39,11 +42,13 @@ module.exports = function(config) {
 
 
     // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR ||
+    //  config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
 
-    // enable / disable watching file and executing tests whenever any file changes
+    // enable / disable watching file and executing
+    // tests whenever any file changes
     autoWatch: true,
 
 
