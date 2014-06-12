@@ -30,4 +30,21 @@ describe('Before joint-point', function () {
       };
     expect(before._wrapper(params));
   });
+
+  it('should invoke the advice before the method', function () {
+    var before = new Aspects[JOINT_POINTS.BEFORE](function () {
+      adviceCalled = true;
+      expect(methodCalled).toBeFalsy();
+    }),
+    params = {
+      method: function () {
+        methodCalled = true;
+        expect(adviceCalled).toBeTruthy();
+      },
+      context: {}
+    },
+    adviceCalled = false,
+    methodCalled = false;
+    before._wrapper(params);
+  });
 });
