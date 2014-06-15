@@ -1,7 +1,6 @@
 'use strict';
 
 describe('Before joint-point', function () {
-
   it('should be defined', function () {
     expect(typeof Aspects[JOINT_POINTS.BEFORE]).toBe('function');
   });
