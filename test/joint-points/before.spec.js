@@ -2,10 +2,6 @@
 
 describe('Before joint-point', function () {
 
-  beforeEach(function () {
-    
-  });
-
   it('should be defined', function () {
     expect(typeof Aspects[JOINT_POINTS.BEFORE]).toBe('function');
   });
