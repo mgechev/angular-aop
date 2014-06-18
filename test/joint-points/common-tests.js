@@ -1,5 +1,4 @@
 function commonJointpointTests(jointPoint) {
-
   'use strict';
 
   it('should be defined', function () {
@@ -26,4 +25,4 @@ function commonJointpointTests(jointPoint) {
       };
     expect(after._wrapper(params));
   });
-};
+}
