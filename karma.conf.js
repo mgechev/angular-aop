@@ -22,6 +22,7 @@ module.exports = function (config) {
       'src/angular-aop.js',
       'src/aspects/aspect.js',
       'src/**/*.js',
+      'test/joint-points/common-tests.js',
       'test/**/*spec.js'
     ],
 
