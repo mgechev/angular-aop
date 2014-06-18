@@ -6,28 +6,28 @@ describe('After joint-point', function () {
   });
 
   it('should extend Aspect', function () {
-    var before = new Aspects[JOINT_POINTS.AFTER](42);
-    expect(before instanceof Aspect).toBeTruthy();
+    var after = new Aspects[JOINT_POINTS.AFTER](42);
+    expect(after instanceof Aspect).toBeTruthy();
   });
 
   it('should set appropriate value to when', function () {
-    var before = new Aspects[JOINT_POINTS.AFTER](42);
-    expect(before.when).toBe(JOINT_POINTS.AFTER);
+    var after = new Aspects[JOINT_POINTS.AFTER](42);
+    expect(after.when).toBe(JOINT_POINTS.AFTER);
   });
 
   it('should invoke the advice with the appropriate context', function () {
-    var before = new Aspects[JOINT_POINTS.AFTER](function () {}),
+    var after = new Aspects[JOINT_POINTS.AFTER](function () {}),
         params = {
         method: function () {
           expect(this).toBe(params.context);
         },
         context: {}
       };
-    expect(before._wrapper(params));
+    expect(after._wrapper(params));
   });
 
   it('should invoke the advice after the method', function () {
-    var before = new Aspects[JOINT_POINTS.AFTER](function () {
+    var after = new Aspects[JOINT_POINTS.AFTER](function () {
       adviceCalled = true;
       expect(methodCalled).toBeTruthy();
     }),
@@ -40,6 +40,6 @@ describe('After joint-point', function () {
     },
     adviceCalled = false,
     methodCalled = false;
-    before._wrapper(params);
+    after._wrapper(params);
   });
 });
