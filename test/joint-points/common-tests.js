@@ -1,6 +1,9 @@
 function commonJointpointTests(jointPoint) {
   'use strict';
 
+  var KEYS = ['when', 'method', 'args', 'exception',
+        'result', 'resolveArgs', 'rejectArgs'];
+
   it('should be defined', function () {
     expect(typeof Aspects[jointPoint]).toBe('function');
   });
@@ -26,9 +29,12 @@ function commonJointpointTests(jointPoint) {
     expect(after._wrapper(params));
   });
 
-  it('should invoke the advice with appropriate parameters', function () {
+  it('should invoke the advice with appropriate object', function () {
     var after = new Aspects[jointPoint](function (args) {
-          expect(args.when).toBe(jointPoint);
+          var keys = Object.keys(args);
+          KEYS.forEach(function (k) {
+            expect(keys.indexOf(k) >= 0).toBeTruthy();
+          });
         }),
         params = {
         method: function () {
