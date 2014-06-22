@@ -6,6 +6,7 @@ describe('Before joint-point', function () {
   it('should invoke the advice before the method', function () {
     var before = new Aspects[JOINT_POINTS.BEFORE](function () {
       adviceCalled = true;
+        console.log(arguments);
       expect(methodCalled).toBeFalsy();
     }),
     params = {

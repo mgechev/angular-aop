@@ -25,4 +25,17 @@ function commonJointpointTests(jointPoint) {
       };
     expect(after._wrapper(params));
   });
+
+  it('should invoke the advice with appropriate parameters', function () {
+    var after = new Aspects[jointPoint](function (args) {
+          expect(args.when).toBe(jointPoint);
+        }),
+        params = {
+        method: function () {
+          expect(this).toBe(params.context);
+        },
+        context: {}
+      };
+    expect(after._wrapper(params));
+  });
 }
