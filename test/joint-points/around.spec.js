@@ -1,6 +1,6 @@
-'use strict';
-
 describe('Around joint-point', function () {
+  'use strict';
+
   commonJointpointTests(JOINT_POINTS.AROUND);
 
   it('should invoke the advice around the method', function () {

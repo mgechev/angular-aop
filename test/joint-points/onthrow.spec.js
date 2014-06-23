@@ -1,6 +1,6 @@
-'use strict';
-
 describe('On throw joint-point', function () {
+  'use strict';
+
   commonJointpointTests(JOINT_POINTS.ON_THROW);
 
   it('should invoke the advice after throw of error', function () {

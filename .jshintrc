@@ -36,6 +36,7 @@
     "it": false,
     "describe": false,
     "beforeEach": false,
-    "expect": false
+    "expect": false,
+    "commonJointpointTests": false
   }
 }

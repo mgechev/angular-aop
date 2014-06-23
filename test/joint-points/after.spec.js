@@ -1,6 +1,6 @@
-'use strict';
-
 describe('After joint-point', function () {
+  'use strict';
+
   commonJointpointTests(JOINT_POINTS.AFTER);
 
   it('should invoke the advice after the method', function () {

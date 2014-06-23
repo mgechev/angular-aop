@@ -1,7 +1,6 @@
 /* global describe,it,expect */
 
 describe('Angular AOP', function () {
-
   'use strict';
 
   it('should define AngularAOP module', function () {
