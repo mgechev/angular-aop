@@ -1,4 +1,4 @@
-/* global describe,it,expect */
+/* global describe,it,expect,inject,spyOn */
 
 describe('Angular AOP', function () {
   'use strict';
@@ -19,6 +19,73 @@ describe('Angular AOP', function () {
       execute = injector.get('execute');
     }).not.toThrow();
     expect(typeof execute).toBe('function');
+  });
+
+  describe('The API', function () {
+
+    beforeEach(function () {
+      angular.mock.module('AngularAOP');
+    });
+
+    describe('forceObject', function () {
+
+      it('should not wrap function\'s methods if "forceObject"' +
+        'property is set to false',
+
+        inject(function (execute) {
+        var target = function () {
+          targetCalled = true;
+        };
+        var targetCalled = false;
+        target.method = function () {
+        };
+        target.anotherMethod = function () {
+        };
+        var parentObj = {};
+        parentObj.advice = function () {
+        };
+        var adviceSpy = spyOn(parentObj, 'advice');
+        var aspect = execute(parentObj.advice).around(target, {
+          forceObject: false
+        });
+        aspect.method();
+        expect(adviceSpy).not.toHaveBeenCalled();
+        expect(targetCalled).toBeFalsy();
+        aspect();
+        expect(adviceSpy).toHaveBeenCalled();
+        expect(targetCalled).toBeTruthy();
+      }));
+
+
+      it('should wrap function\'s methods if "forceObject"' +
+        'property is set to true',
+
+        inject(function (execute) {
+        var target = function () {
+        };
+        var targetCalled = false;
+        target.method = function () {
+          targetCalled = true;
+        };
+        target.anotherMethod = function () {
+        };
+        var parentObj = {};
+        parentObj.advice = function () {
+        };
+        var adviceSpy = spyOn(parentObj, 'advice');
+        var aspect = execute(parentObj.advice).around(target, {
+          forceObject: true
+        });
+        aspect();
+        expect(adviceSpy).not.toHaveBeenCalled();
+        expect(targetCalled).toBeFalsy();
+        aspect.method();
+        expect(adviceSpy).toHaveBeenCalled();
+        expect(targetCalled).toBeTruthy();
+      }));
+
+    });
+
   });
 
 });

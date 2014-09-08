@@ -282,6 +282,14 @@ DemoApp.config(function ($provide, executeProvider) {
 
 **Note:** In this way you won't couple your target methods/objects with the aspect at all but your target service must be defined as provider.
 
+##v0.1.2
+
+Added `forceObject` property to the rules. This way issues like [#12](https://github.com/mgechev/angular-aop/issues/12) will not be reproducable since we can force the framework to wrap the target's method, insted of the target itself (in case the target is a function with "static" methods").
+
+Issues fixed:
+
+- Once a function is wrapped into an aspect its methods are preserved. We add the target to be prototype of the wrapper, this way using the prototype chain the required methods could be found.
+
 Roadmap
 =======
 
