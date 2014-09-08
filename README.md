@@ -259,7 +259,7 @@ DemoApp.config(function ($provide, executeProvider) {
 });
 ```
 
-##v0.1.1
+##v0.2.0
 
 Multiple aspects can be applied to single service through the new way of annotation:
 
