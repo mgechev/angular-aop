@@ -297,7 +297,6 @@ Roadmap
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
 3. Write solid amount of tests
 4. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
-5. To put all aspect definitions outside the local scope of the provider for easier testing
 
 License
 =======
