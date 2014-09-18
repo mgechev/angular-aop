@@ -32,14 +32,22 @@ describe('Angular AOP', function () {
       function () {
 
       var dummyServiceSpyActiveMethod,
-          dummyServiceSpyInactiveMethod;
+          dummyServiceSpyInactiveMethod,
+          a1Spy, a2Spy,
+          advices = {
+          a1: function () {},
+          a2: function () {}
+        };
+
+      a1Spy = spyOn(advices, 'a1');
+      a2Spy = spyOn(advices, 'a2');
 
       module.factory('A1', function () {
-        return function () {};
+        return advices.a1;
       });
 
       module.factory('A2', function () {
-        return function () {};
+        return advices.a2;
       });
 
       module.factory('DummyService', function () {
@@ -67,8 +75,10 @@ describe('Angular AOP', function () {
       var ds = angular.injector(['ng', 'Test']).get('DummyService');
       ds.active();
       expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
       ds.inactive();
       expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
+      expect(a2Spy).not.toHaveBeenCalled();
 
     });
 
