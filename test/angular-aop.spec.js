@@ -46,7 +46,9 @@ describe('Angular AOP', function () {
 
       module.factory('DummyService', function () {
         var api = {
-          active: function () {},
+          active: function (simpleArg) {
+            return simpleArg;
+          },
           inactive: function () {}
         };
         dummyServiceSpyActiveMethod =
@@ -55,6 +57,31 @@ describe('Angular AOP', function () {
           spyOn(api, 'inactive');
         return api;
       });
+    });
+
+    it('should be able to annotate services in the config callback',
+      function () {
+
+      module.config(function (executeProvider, $provide) {
+        executeProvider.annotate($provide, {
+          'DummyService': [{
+            jointPoint: 'before',
+            advice: 'A1'
+          }]
+        });
+      });
+
+      var ds = angular.injector(['ng', 'Test']).get('DummyService');
+      ds.active();
+      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
+
+    });
+
+
+    it('should be able to filter methods based on' +
+       'pattern matching the method name',
+      function () {
 
       module.config(function (executeProvider, $provide) {
         executeProvider.annotate($provide, {
@@ -65,21 +92,6 @@ describe('Angular AOP', function () {
           }]
         });
       });
-    });
-
-    it('should be able to annotate services in the config callback',
-      function () {
-
-      var ds = angular.injector(['ng', 'Test']).get('DummyService');
-      ds.active();
-      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
-      expect(a1Spy).toHaveBeenCalled();
-
-    });
-
-
-    it('should be able to annotate services in the config callback',
-      function () {
 
       var ds = angular.injector(['ng', 'Test']).get('DummyService');
       ds.inactive();
@@ -89,6 +101,32 @@ describe('Angular AOP', function () {
       ds.active();
       expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
       expect(a1Spy).toHaveBeenCalled();
+    });
+
+    it('should be able to filter methods based on ' +
+      'pattern matching the method args',
+      function () {
+
+//      module.config(function (executeProvider, $provide) {
+//        executeProvider.annotate($provide, {
+//          'DummyService': [{
+//            jointPoint: 'before',
+//            advice: 'A1',
+//            argsPattern: [/^simple/]
+//          }]
+//        });
+//      });
+
+
+      var ds = angular.injector(['ng', 'Test']).get('DummyService');
+      ds.inactive();
+      expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
+      expect(a1Spy).not.toHaveBeenCalled();
+
+      ds.active();
+      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
+
     });
 
     afterEach(function () {
