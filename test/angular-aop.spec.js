@@ -22,133 +22,77 @@ describe('Angular AOP', function () {
   });
 
   describe('annotation', function () {
+    var module,
+        dummyServiceSpyActiveMethod,
+        dummyServiceSpyInactiveMethod,
+        a1Spy, a2Spy, advices;
+    beforeEach(function () {
+      module = angular.module('Test', ['AngularAOP']);
+      advices = {
+        a1: function () {},
+        a2: function () {}
+      };
 
-    describe('basic sanity check', function () {
+      a1Spy = spyOn(advices, 'a1');
+      a2Spy = spyOn(advices, 'a2');
 
-      var module;
-      beforeEach(function () {
-        module = angular.module('Test', ['AngularAOP']);
+      module.factory('A1', function () {
+        return advices.a1;
       });
 
-      it('should be able to annotate services in the config callback',
-        function () {
-
-        var dummyServiceSpyActiveMethod,
-            a1Spy, a2Spy,
-            advices = {
-            a1: function () {},
-            a2: function () {}
-          };
-
-        a1Spy = spyOn(advices, 'a1');
-        a2Spy = spyOn(advices, 'a2');
-
-        module.factory('A1', function () {
-          return advices.a1;
-        });
-
-        module.factory('A2', function () {
-          return advices.a2;
-        });
-
-        module.factory('DummyService', function () {
-          var api = {
-            active: function () {}
-          };
-          dummyServiceSpyActiveMethod =
-            spyOn(api, 'active');
-          return api;
-        });
-
-        module.config(function (executeProvider, $provide) {
-          executeProvider.annotate($provide, {
-            'DummyService': [{
-              jointPoint: 'before',
-              advice: 'A1'
-            }]
-          });
-        });
-
-
-        var ds = angular.injector(['ng', 'Test']).get('DummyService');
-        ds.active();
-        expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
-        expect(a1Spy).toHaveBeenCalled();
-
+      module.factory('A2', function () {
+        return advices.a2;
       });
 
-      afterEach(function () {
-        angular.bootstrap(document, ['Test']);
+      module.factory('DummyService', function () {
+        var api = {
+          active: function () {},
+          inactive: function () {}
+        };
+        dummyServiceSpyActiveMethod =
+          spyOn(api, 'active');
+        dummyServiceSpyInactiveMethod =
+          spyOn(api, 'inactive');
+        return api;
       });
+
+      module.config(function (executeProvider, $provide) {
+        executeProvider.annotate($provide, {
+          'DummyService': [{
+            jointPoint: 'before',
+            advice: 'A1',
+            methodPattern: /^a/
+          }]
+        });
+      });
+    });
+
+    it('should be able to annotate services in the config callback',
+      function () {
+
+      var ds = angular.injector(['ng', 'Test']).get('DummyService');
+      ds.active();
+      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
 
     });
 
 
-    describe('method matching', function () {
+    it('should be able to annotate services in the config callback',
+      function () {
 
-      var module;
-      beforeEach(function () {
-        module = angular.module('Test', ['AngularAOP']);
-      });
+      var ds = angular.injector(['ng', 'Test']).get('DummyService');
+      ds.inactive();
+      expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
+      expect(a1Spy).not.toHaveBeenCalled();
 
-      it('should be able to annotate services in the config callback',
-        function () {
+      ds.active();
+      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
+    });
 
-        var dummyServiceSpyActiveMethod,
-            dummyServiceSpyInactiveMethod,
-            a1Spy, a2Spy,
-            advices = {
-            a1: function () {},
-            a2: function () {}
-          };
-
-        a1Spy = spyOn(advices, 'a1');
-        a2Spy = spyOn(advices, 'a2');
-
-        module.factory('A1', function () {
-          return advices.a1;
-        });
-
-        module.factory('A2', function () {
-          return advices.a2;
-        });
-
-        module.factory('DummyService', function () {
-          var api = {
-            active: function () {},
-            inactive: function () {}
-          };
-          dummyServiceSpyActiveMethod =
-            spyOn(api, 'active');
-          dummyServiceSpyInactiveMethod =
-            spyOn(api, 'inactive');
-          return api;
-        });
-
-        module.config(function (executeProvider, $provide) {
-          executeProvider.annotate($provide, {
-            'DummyService': [{
-              jointPoint: 'before',
-              advice: 'A1',
-              methodPattern: /^a/
-            }]
-          });
-        });
-
-
-        var ds = angular.injector(['ng', 'Test']).get('DummyService');
-        ds.inactive();
-        expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
-        expect(a1Spy).not.toHaveBeenCalled();
-
-        ds.active();
-        expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
-        expect(a1Spy).toHaveBeenCalled();
-      });
-
-      afterEach(function () {
-        angular.bootstrap(document, ['Test']);
-      });
+    afterEach(function () {
+      angular.bootstrap(document, ['Test']);
     });
 
   });
