@@ -298,6 +298,15 @@ Roadmap
 3. Write solid amount of tests
 4. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
 
+Contributors
+============
+
+[![mgechev](https://avatars.githubusercontent.com/u/455023?v=2&s=117)](https://github.com/mgechev)[![Wizek](https://avatars.githubusercontent.com/u/491672?v=2&s=117)](https://github.com/Wizek)[![slobo](https://avatars.githubusercontent.com/u/167772?v=2&s=117)](https://github.com/slobo)[![bitdeli-chef](https://avatars.githubusercontent.com/u/3092978?v=2&s=117)](https://github.com/bitdeli-chef)[![christianacca](https://avatars.githubusercontent.com/u/886590?v=2&s=117)](https://github.com/christianacca)
+
+[![peernohell](https://avatars.githubusercontent.com/u/119765?v=2&s=117)](https://github.com/peernohell)
+
+
+
 License
 =======
 
