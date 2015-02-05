@@ -4,11 +4,10 @@ describe('On resolve joint-point', function () {
   commonJointpointTests(JOINT_POINTS.ON_RESOLVE);
 
   it('should invoke the advice after the method was resolved',
-    function () {
-      var onResolve = new Aspects[JOINT_POINTS.ON_RESOLVE](function (done) {
+    function (done) {
+      var onResolve = new Aspects[JOINT_POINTS.ON_RESOLVE](function () {
         adviceCalled = true;
         expect(methodCalled).toBeTruthy();
-        console.log(4242);
         done();
       });
       var params = {

@@ -1,4 +1,4 @@
-/* global describe,it,expect,inject,spyOn,afterEach,document */
+/* global describe,it,expect,spyOn,afterEach,document */
 
 describe('Angular AOP', function () {
   'use strict';
