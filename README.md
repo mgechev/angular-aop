@@ -301,10 +301,9 @@ Roadmap
 Contributors
 ============
 
-[![mgechev](https://avatars.githubusercontent.com/u/455023?v=2&s=117)](https://github.com/mgechev)[![Wizek](https://avatars.githubusercontent.com/u/491672?v=2&s=117)](https://github.com/Wizek)[![slobo](https://avatars.githubusercontent.com/u/167772?v=2&s=117)](https://github.com/slobo)[![bitdeli-chef](https://avatars.githubusercontent.com/u/3092978?v=2&s=117)](https://github.com/bitdeli-chef)[![christianacca](https://avatars.githubusercontent.com/u/886590?v=2&s=117)](https://github.com/christianacca)
-
-[![peernohell](https://avatars.githubusercontent.com/u/119765?v=2&s=117)](https://github.com/peernohell)
-
+[<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=3&s=117" width="117">](https://github.com/mgechev) |[<img alt="Wizek" src="https://avatars.githubusercontent.com/u/491672?v=3&s=117" width="117">](https://github.com/Wizek) |[<img alt="slobo" src="https://avatars.githubusercontent.com/u/167772?v=3&s=117" width="117">](https://github.com/slobo) |[<img alt="bitdeli-chef" src="https://avatars.githubusercontent.com/u/3092978?v=3&s=117" width="117">](https://github.com/bitdeli-chef) |[<img alt="christianacca" src="https://avatars.githubusercontent.com/u/886590?v=3&s=117" width="117">](https://github.com/christianacca) |[<img alt="peernohell" src="https://avatars.githubusercontent.com/u/119765?v=3&s=117" width="117">](https://github.com/peernohell) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[mgechev](https://github.com/mgechev) |[Wizek](https://github.com/Wizek) |[slobo](https://github.com/slobo) |[bitdeli-chef](https://github.com/bitdeli-chef) |[christianacca](https://github.com/christianacca) |[peernohell](https://github.com/peernohell) |
 
 
 License
