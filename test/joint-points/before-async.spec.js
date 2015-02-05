@@ -1,4 +1,4 @@
-describe('After joint-point', function () {
+describe('Before async joint-point', function () {
   'use strict';
 
   commonJointpointTests(JOINT_POINTS.BEFORE_ASYNC);
