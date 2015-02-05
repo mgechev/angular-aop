@@ -1,4 +1,7 @@
 {
+  "browser": true,
+  "jquery": true,
+  "node": true,
   "esnext": true,
   "bitwise": true,
   "camelcase": true,
@@ -11,7 +14,6 @@
   "quotmark": "single",
   "unused": true,
   "strict": true,
-  "globalstrict": true,
   "trailing": true,
   "smarttabs": true,
   "white": true,
@@ -25,18 +27,5 @@
   "loopfunc": true,
   "maxcomplexity": 9,
   "maxlen": 80,
-  "globals": {
-    "angular": false,
-    "module": false,
-    "Aspects": false,
-    "JOINT_POINTS": false,
-    "Aspect": false,
-    "MaybeQ": false,
-    "require": false,
-    "it": false,
-    "describe": false,
-    "beforeEach": false,
-    "expect": false,
-    "commonJointpointTests": false
-  }
+  "maxparams": 4
 }
