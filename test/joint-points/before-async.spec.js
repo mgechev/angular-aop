@@ -4,7 +4,7 @@ describe('Before async joint-point', function () {
   commonJointpointTests(JOINT_POINTS.BEFORE_ASYNC);
 
   it('should invoke the method after the advice\'s result was resolved',
-    function () {
+    function (done) {
       var resolved = MaybeQ.when(1);
       var beforeAsync = new Aspects[JOINT_POINTS.BEFORE_ASYNC](function () {
         adviceCalled = true;
@@ -13,9 +13,9 @@ describe('Before async joint-point', function () {
       });
       var params = {
         method: function () {
-          console.log(42);
           methodCalled = true;
           expect(adviceCalled).toBeTruthy();
+          done();
         },
         context: {}
       };
@@ -25,7 +25,7 @@ describe('Before async joint-point', function () {
     });
 
   it('should invoke the method after the advice\'s result was rejected',
-    function () {
+    function (done) {
       var rejected = MaybeQ.reject(1);
       var beforeAsync = new Aspects[JOINT_POINTS.BEFORE_ASYNC](function () {
         adviceCalled = true;
@@ -36,6 +36,7 @@ describe('Before async joint-point', function () {
         method: function () {
           methodCalled = true;
           expect(adviceCalled).toBeTruthy();
+          done();
         },
         context: {}
       };

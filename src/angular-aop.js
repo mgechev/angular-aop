@@ -30,14 +30,14 @@ var AngularAop = angular.module('AngularAOP', []),
 
 /*jslint devel: true, indent: 2 */
 // 15.2.3.2
-if (!Object.setPrototypeOf) {
+//if (!Object.setPrototypeOf) {
   Object.setPrototypeOf = (function (Object, magic) {
     var set;
     function checkArgs(O, proto) {
-      if (typeof O !== 'object' || O === null) {
+      if (!(/object|function/).test(typeof O) || O === null) {
         throw new TypeError('can not set prototype on a non-object');
       }
-      if (typeof proto !== 'object' && proto !== null) {
+      if (!(/object|function/).test(typeof proto) && proto !== null) {
         throw new TypeError('can only set prototype to an object or null');
       }
     }
@@ -88,7 +88,7 @@ if (!Object.setPrototypeOf) {
     }
     return setPrototypeOf;
   }(Object, '__proto__'));
-}
+//}
 
 
 /**

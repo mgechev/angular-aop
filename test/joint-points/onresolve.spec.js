@@ -5,9 +5,11 @@ describe('On resolve joint-point', function () {
 
   it('should invoke the advice after the method was resolved',
     function () {
-      var onResolve = new Aspects[JOINT_POINTS.ON_RESOLVE](function () {
+      var onResolve = new Aspects[JOINT_POINTS.ON_RESOLVE](function (done) {
         adviceCalled = true;
         expect(methodCalled).toBeTruthy();
+        console.log(4242);
+        done();
       });
       var params = {
         method: function () {

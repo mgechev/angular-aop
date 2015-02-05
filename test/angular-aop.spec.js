@@ -13,8 +13,8 @@ describe('Angular AOP', function () {
 
   it('should define service called execute with dependencies in "ng"',
     function () {
-    var injector = angular.injector(['ng', 'AngularAOP']),
-        execute;
+    var injector = angular.injector(['ng', 'AngularAOP']);
+    var execute;
     expect(function () {
       execute = injector.get('execute');
     }).not.toThrow();
@@ -22,11 +22,12 @@ describe('Angular AOP', function () {
   });
 
   describe('annotation', function () {
-
-    var module,
-        dummyServiceSpyActiveMethod,
-        dummyServiceSpyInactiveMethod,
-        a1Spy, a2Spy, advices;
+    var module;
+    var dummyServiceSpyActiveMethod;
+    var dummyServiceSpyInactiveMethod;
+    var a1Spy;
+    var a2Spy;
+    var advices;
 
     beforeEach(function () {
       module = angular.module('Test', ['AngularAOP']);
@@ -63,23 +64,19 @@ describe('Angular AOP', function () {
 
     it('should be able to annotate services in the config callback',
       function () {
-
       module.config(function (executeProvider, $provide) {
         executeProvider.annotate($provide, {
-          'DummyService': [{
+          DummyService: [{
             jointPoint: 'before',
             advice: 'A1'
           }]
         });
       });
-
       var ds = angular.injector(['ng', 'Test']).get('DummyService');
       ds.active();
       expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
       expect(a1Spy).toHaveBeenCalled();
-
     });
-
 
     it('should be able to filter methods based on' +
        'pattern matching the method name',
@@ -87,7 +84,7 @@ describe('Angular AOP', function () {
 
       module.config(function (executeProvider, $provide) {
         executeProvider.annotate($provide, {
-          'DummyService': [{
+          DummyService: [{
             jointPoint: 'before',
             advice: 'A1',
             methodPattern: /^a/
@@ -106,31 +103,30 @@ describe('Angular AOP', function () {
     });
 
 // Cannot test with spys
-//    it('should be able to filter methods based on ' +
-//      'pattern matching the method args',
-//      function () {
-//
-//      module.config(function (executeProvider, $provide) {
-//        executeProvider.annotate($provide, {
-//          'DummyService': [{
-//            jointPoint: 'before',
-//            advice: 'A1',
-//            argsPatterns: [/^simple/]
-//          }]
-//        });
-//      });
-//
-//
-//      var ds = angular.injector(['ng', 'Test']).get('DummyService');
-//      ds.inactive();
-//      expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
+    it('should be able to filter methods based on ' +
+      'pattern matching the method args',
+      function () {
+
+      module.config(function (executeProvider, $provide) {
+        executeProvider.annotate($provide, {
+          DummyService: [{
+            jointPoint: 'before',
+            advice: 'A1',
+            argsPatterns: [/^simple/]
+          }]
+        });
+      });
+
+      var ds = angular.injector(['ng', 'Test']).get('DummyService');
+      ds.inactive();
+      expect(dummyServiceSpyInactiveMethod).toHaveBeenCalled();
 //      expect(a1Spy).not.toHaveBeenCalled();
-//
-//      ds.active();
-//      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
-//      expect(a1Spy).toHaveBeenCalled();
-//
-//    });
+
+      ds.active();
+      expect(dummyServiceSpyActiveMethod).toHaveBeenCalled();
+      expect(a1Spy).toHaveBeenCalled();
+
+    });
 
     afterEach(function () {
       angular.bootstrap(document, ['Test']);
@@ -140,16 +136,16 @@ describe('Angular AOP', function () {
 
   describe('The API', function () {
 
+    var module;
     beforeEach(function () {
-      angular.mock.module('AngularAOP');
+      module = angular.module('Test', ['AngularAOP']);
     });
 
     describe('forceObject', function () {
-
-      it('should not wrap function\'s methods if "forceObject"' +
-        'property is set to false',
-
-        inject(function (execute) {
+      it('should not wrap function\'s methods if "forceObject" ' +
+        'property is set to false', function () {
+        var injector = angular.injector(['ng', 'AngularAOP']);
+        var execute = injector.get('execute');
         var target = function () {
           targetCalled = true;
         };
@@ -171,13 +167,13 @@ describe('Angular AOP', function () {
         aspect();
         expect(adviceSpy).toHaveBeenCalled();
         expect(targetCalled).toBeTruthy();
-      }));
+      });
 
+      it('should wrap function\'s methods if "forceObject" ' +
+        'property is set to true', function () {
 
-      it('should wrap function\'s methods if "forceObject"' +
-        'property is set to true',
-
-        inject(function (execute) {
+        var injector = angular.injector(['ng', 'AngularAOP']);
+        var execute = injector.get('execute');
         var target = function () {
         };
         var targetCalled = false;
@@ -199,7 +195,7 @@ describe('Angular AOP', function () {
         aspect.method();
         expect(adviceSpy).toHaveBeenCalled();
         expect(targetCalled).toBeTruthy();
-      }));
+      });
 
     });
 
