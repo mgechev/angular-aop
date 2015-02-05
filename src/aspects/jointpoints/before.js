@@ -1,3 +1,4 @@
+/* global Aspects, JOINT_POINTS, Aspect */
 'use strict';
 
 Aspects[JOINT_POINTS.BEFORE] = function () {

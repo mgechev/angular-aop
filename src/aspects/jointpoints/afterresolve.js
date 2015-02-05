@@ -1,3 +1,4 @@
+/* global Aspects, JOINT_POINTS, Aspect, MaybeQ */
 'use strict';
 
 Aspects[JOINT_POINTS.AFTER_RESOLVE] = function () {
@@ -9,13 +10,13 @@ Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype =
         Object.create(Aspect.prototype);
 
 Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
-  var args = params.args,
-    context = params.context,
-    method = params.method,
-    deferred = MaybeQ.defer(),
-    innerPromise = deferred.promise,
-    promise = method.apply(context, args),
-    self = this;
+  var args = params.args;
+  var context = params.context;
+  var method = params.method;
+  var deferred = MaybeQ.defer();
+  var innerPromise = deferred.promise;
+  var promise = method.apply(context, args);
+  var self = this;
   promise.then(function () {
     params.resolveArgs = arguments;
     innerPromise.then(function () {

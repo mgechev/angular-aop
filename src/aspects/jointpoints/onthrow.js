@@ -1,3 +1,4 @@
+/* global Aspects, JOINT_POINTS, Aspect */
 'use strict';
 
 Aspects[JOINT_POINTS.ON_THROW] = function () {
@@ -8,8 +9,8 @@ Aspects[JOINT_POINTS.ON_THROW] = function () {
 Aspects[JOINT_POINTS.ON_THROW].prototype = Object.create(Aspect.prototype);
 
 Aspects[JOINT_POINTS.ON_THROW].prototype._wrapper = function (params) {
-  var args = params.args,
-    result;
+  var args = params.args;
+  var result;
   try {
     result = params.method.apply(params.context, args);
   } catch (e) {

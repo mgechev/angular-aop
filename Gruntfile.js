@@ -4,6 +4,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-jscs');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -23,12 +24,20 @@ module.exports = function (grunt) {
     },
     karma: {
       unit: {
-        configFile: 'karma.conf.js'
+        configFile: 'karma.conf.js',
+        singleRun: true
+      }
+    },
+    jscs: {
+      src: './src/**/*.js',
+      options: {
+        config: '.jscsrc'
       }
     }
   });
 
   grunt.registerTask('test', 'karma');
+  grunt.registerTask('build', ['test', 'jscs', 'uglify']);
 
   grunt.registerTask('default', 'uglify');
 };

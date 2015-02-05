@@ -1,3 +1,4 @@
+/* global Aspects, JOINT_POINTS, Aspect, MaybeQ */
 'use strict';
 
 Aspects[JOINT_POINTS.BEFORE_ASYNC] = function () {

@@ -1,3 +1,4 @@
+/* global angular */
 /**
  * Framework for aspect-oriented programming with AngularJS
  *
@@ -8,29 +9,27 @@
 
 'use strict';
 
-var AngularAop = angular.module('AngularAOP', []),
+var AngularAop = angular.module('AngularAOP', []);
 
-  //Contains all aspects (pointcut + advice)
-  Aspects = {},
+//Contains all aspects (pointcut + advice)
+var Aspects = {};
 
   //Defines all joint points
-  JOINT_POINTS = {
-    BEFORE: 'Before',
-    BEFORE_ASYNC: 'BeforeAsync',
-    AFTER: 'After',
-    AROUND: 'Around',
-    AROUND_ASYNC: 'AroundAsync',
-    ON_THROW: 'OnThrow',
-    ON_RESOLVE: 'OnResolve',
-    AFTER_RESOLVE: 'AfterResolve',
-    ON_REJECT: 'OnReject'
-  },
+var JOINT_POINTS = {
+  BEFORE: 'Before',
+  BEFORE_ASYNC: 'BeforeAsync',
+  AFTER: 'After',
+  AROUND: 'Around',
+  AROUND_ASYNC: 'AroundAsync',
+  ON_THROW: 'OnThrow',
+  ON_RESOLVE: 'OnResolve',
+  AFTER_RESOLVE: 'AfterResolve',
+  ON_REJECT: 'OnReject'
+};
 
-  MaybeQ = null;
+var MaybeQ = null;
 
-/*jslint devel: true, indent: 2 */
-// 15.2.3.2
-//if (!Object.setPrototypeOf) {
+if (!Object.setPrototypeOf) {
   Object.setPrototypeOf = (function (Object, magic) {
     var set;
     function checkArgs(O, proto) {
@@ -57,7 +56,8 @@ var AngularAop = angular.module('AngularAOP', []),
         // neither can any browser that actually
         // implemented __proto__ correctly
         // (all but old V8 will return here)
-        {__proto__: null}.__proto__ === void 0
+        /* jshint proto: true */
+        { __proto__: null }.__proto__ === void 0
         // this case means null objects cannot be passed
         // through setPrototypeOf in a reliable way
         // which means here a **Sham** is needed instead
@@ -88,8 +88,7 @@ var AngularAop = angular.module('AngularAOP', []),
     }
     return setPrototypeOf;
   }(Object, '__proto__'));
-//}
-
+}
 
 /**
  * Service which give access to the pointcuts.
@@ -97,27 +96,30 @@ var AngularAop = angular.module('AngularAOP', []),
 AngularAop.provider('execute', function executeProvider() {
 
   //Default regular expression for matching arguments and method names
-  var defaultRule = /.*/,
+  var defaultRule = /.*/;
 
-    slice = Array.prototype.slice,
+  var slice = Array.prototype.slice;
 
     //Cross-browser trim function
-    trim = (function () {
+  var trim = (function () {
       var trimFunction;
       if (typeof String.prototype.trim === 'function') {
         trimFunction = String.prototype.trim;
       } else {
+        if (this === null) {
+          return '';
+        }
+        var strVal = this.toString();
         trimFunction = function () {
-          return this === null ?
-            '' :
-            (this + '').replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+          return strVal
+            .replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
         };
       }
       return trimFunction;
-    }()),
+    }());
 
     //Builds specified aspect
-    AspectBuilder = {
+  var AspectBuilder = {
       buildAspect: function (advice, jointPoint) {
         var self = this;
         return function (target, rules) {
@@ -131,8 +133,8 @@ AngularAop.provider('execute', function executeProvider() {
       },
       _getFunctionAspect: function (method, jointPoint, advice, methodName) {
         methodName = methodName || this._getMethodName(method);
-        var aspect = new Aspects[jointPoint](advice),
-          wrapper = function __angularAOPWrapper__() {
+        var aspect = new Aspects[jointPoint](advice);
+        var wrapper = function __angularAOPWrapper__() {
             var args = slice.call(arguments);
             args = {
               args: args,
@@ -165,10 +167,10 @@ AngularAop.provider('execute', function executeProvider() {
         return obj;
       },
       _matchRules: function (obj, prop, rules) {
-        var methodPattern = rules.methodPattern || defaultRule,
-          argsPatterns = rules.argsPatterns || [],
-          method = obj[prop],
-          tokens = this._parseMethod(method, prop);
+        var methodPattern = rules.methodPattern || defaultRule;
+        var argsPatterns = rules.argsPatterns || [];
+        var method = obj[prop];
+        var tokens = this._parseMethod(method, prop);
         while (tokens.when === '__angularAOPWrapper__') {
           method = method.originalMethod;
           tokens = this._parseMethod(method, prop);
@@ -191,8 +193,8 @@ AngularAop.provider('execute', function executeProvider() {
         return passed;
       },
       _parseMethod: function (method, prop) {
-        var result = { method: prop },
-            parts = method.toString()
+        var result = { method: prop };
+        var  parts = method.toString()
               //stripping the comments
               .replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')
               .match(/function\s+([^\(]*)\s*\(([^\)]*)\)/) || [];
@@ -247,11 +249,11 @@ AngularAop.provider('execute', function executeProvider() {
     $provide.decorator(target, ['$q', '$injector', '$delegate',
             function ($q, $injector, $delegate) {
       var advice = (typeof annotation.advice === 'string') ?
-              $injector.get(annotation.advice) : annotation.advice,
-          jointPoint = annotation.jointPoint,
-          methodPattern = annotation.methodPattern,
-          argsPatterns = annotation.argsPattern,
-          aspect = new AspectCollection(advice);
+              $injector.get(annotation.advice) : annotation.advice;
+      var jointPoint = annotation.jointPoint;
+      var methodPattern = annotation.methodPattern;
+      var argsPatterns = annotation.argsPattern;
+      var aspect = new AspectCollection(advice);
       MaybeQ = $q;
       if (typeof aspect[jointPoint] !== 'function') {
         throw new Error('No such joint-point ' + jointPoint);
