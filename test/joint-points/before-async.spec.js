@@ -13,6 +13,7 @@ describe('After joint-point', function () {
       });
       var params = {
         method: function () {
+          console.log(42);
           methodCalled = true;
           expect(adviceCalled).toBeTruthy();
         },
