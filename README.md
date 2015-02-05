@@ -291,6 +291,15 @@ Issues fixed:
 
 - Once a function is wrapped into an aspect its methods are preserved. We add the target to be prototype of the wrapper, this way using the prototype chain the required methods could be found.
 
+##v0.2.1
+
+Added tests for:
+
+- Before async joint-point
+- On resolve joint-point
+
+Add JSCS and update Gruntfile.js
+
 Roadmap
 =======
 
