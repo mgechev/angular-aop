@@ -1,3 +1,5 @@
+<img src="https://travis-ci.org/mgechev/angular-aop.svg?branch=master" alt="">
+
 Table of Contents
 ========
 * [About AngularAOP](#about-angularaop)
