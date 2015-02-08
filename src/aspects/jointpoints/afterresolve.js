@@ -17,6 +17,9 @@ Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
   var innerPromise = deferred.promise;
   var promise = method.apply(context, args);
   var self = this;
+  if (!promise || typeof promise.then !== 'function') {
+    throw new Error('The woven method doesn\'t return a promise');
+  }
   promise.then(function () {
     params.resolveArgs = arguments;
     innerPromise.then(function () {

@@ -23,6 +23,7 @@ function commonJointpointTests(jointPoint) {
         params = {
         method: function () {
           expect(this).toBe(params.context);
+          return MaybeQ.when(null);
         },
         context: {}
       };
@@ -39,6 +40,7 @@ function commonJointpointTests(jointPoint) {
         params = {
         method: function () {
           expect(this).toBe(params.context);
+          return MaybeQ.when(null);
         },
         context: {}
       };

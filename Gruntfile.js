@@ -26,6 +26,10 @@ module.exports = function (grunt) {
       unit: {
         configFile: 'karma.conf.js',
         singleRun: true
+      },
+      devunit: {
+        configFile: 'karma.conf.js',
+        singleRun: false
       }
     },
     jscs: {
@@ -36,7 +40,9 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('test', 'karma');
+  grunt.registerTask('dev', 'karma:devunit');
+
+  grunt.registerTask('test', 'karma:unit');
   grunt.registerTask('build', ['test', 'jscs', 'uglify']);
 
   grunt.registerTask('default', 'uglify');
