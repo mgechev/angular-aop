@@ -28,15 +28,15 @@ myModule.config(function ($provide, executeProvider) {
 
 The joint-points supported in the current version of the framework are:
 
-- `After` - the advice will be invoked after the target method
-- `AfterResolve` - the advice will be invoked after the promise returned by target method has been resolved
-- `AroundAsync` - the advice will be invoked before the target method was invoked and after the promise returned by it was resolved
-- `Around` - the advice will be invoked before the target method was invoked and after it was invoked
-- `BeforeAsync` - the target method will be called after the promise returned by the advice was resolved
-- `Before` - the target method will be invoked after the advice
-- `OnReject` - the advice will be invoked when the promise returned by the target method was rejected
-- `OnResolve` - the advice will be invoked after the promise returned by the target method was resolved
-- `OnThrow` - the advice will be called if the target method throws an error
+- `after` - the advice will be invoked after the target method
+- `afterResolveOf` - the advice will be invoked after the promise returned by target method has been resolved and after the resolve callback attached to the promise is invoked
+- `aroundAsync` - the advice will be invoked before the target method was invoked and after the promise returned by it was resolved
+- `around` - the advice will be invoked before the target method was invoked and after it was invoked
+- `beforeAsync` - the target method will be called after the promise returned by the advice was resolved
+- `before` - the target method will be invoked after the advice
+- `onRejectOf` - the advice will be invoked when the promise returned by the target method was rejected
+- `onResolveOf` - the advice will be invoked after the promise returned by the target method was resolved but before the resolve callback attached to the promise is invoked
+- `onThrowOf` - the advice will be called if the target method throws an error
 
 For additional information about Aspect-Oriented Programming and AngularAOP visit the [project's documentation](https://github.com/mgechev/angular-aop/tree/master/docs) and [this blog post](http://blog.mgechev.com/2013/08/07/aspect-oriented-programming-with-javascript-angularjs/).
 
@@ -110,6 +110,7 @@ Add JSCS and update Gruntfile.js
 # Roadmap
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
+2. Use constants for the joint-point's names
 3. Write solid amount of tests
 4. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
 
