@@ -157,7 +157,7 @@ AngularAop.provider('execute', function executeProvider() {
       },
       _getObjectAspect: function (obj, rules, jointPoint, advice) {
         for (var prop in obj) {
-          if (obj.hasOwnProperty(prop) &&
+          if ((obj.hasOwnProperty(prop) || rules.deep) &&
             typeof obj[prop] === 'function' &&
             this._matchRules(obj, prop, rules)) {
             obj[prop] =
@@ -260,7 +260,9 @@ AngularAop.provider('execute', function executeProvider() {
       }
       return aspect[jointPoint]($delegate, {
         methodPattern: methodPattern,
-        argsPatterns: argsPatterns
+        argsPatterns: argsPatterns,
+        forceObject: annotation.forceObject,
+        deep: annotation.deep
       });
     }]);
   }
