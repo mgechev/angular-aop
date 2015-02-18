@@ -1,4 +1,4 @@
-/* global describe,it,expect,spyOn,afterEach,document */
+/* global describe,it,expect,spyOn,afterEach,document,angular,beforeEach */
 
 describe('Angular AOP', function () {
   'use strict';
@@ -196,6 +196,38 @@ describe('Angular AOP', function () {
         expect(adviceSpy).toHaveBeenCalled();
         expect(targetCalled).toBeTruthy();
       });
+
+      // To refactor with spies
+      it('should allow wrapping prototype methods when "deep" is specified',
+          function () {
+            var app = angular.module('demo', ['AngularAOP', 'ng']);
+            var loggerCalled = false;
+            var wovenCalled = false;
+            app.factory('Logger', function () {
+              return function () {
+                loggerCalled = true;
+              };
+            });
+            function DummyService() {}
+            DummyService.prototype.foo = function () {
+              wovenCalled = true;
+            };
+            app.service('DummyService', DummyService);
+            app.config(function ($provide, executeProvider) {
+              executeProvider.annotate($provide, {
+                DummyService: [{
+                  jointPoint: 'after',
+                  advice: 'Logger',
+                  deep: true
+                }]
+              });
+            });
+            var injector = angular.injector(['demo']);
+            var Dummy = injector.get('DummyService');
+            Dummy.foo();
+            expect(wovenCalled).toBeTruthy();
+            expect(loggerCalled).toBeTruthy();
+          });
 
     });
 
