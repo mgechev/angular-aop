@@ -3,6 +3,7 @@ module.exports = function (grunt) {
   'use strict';
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-jscs');
 
@@ -19,6 +20,17 @@ module.exports = function (grunt) {
         },
         options: {
           wrap: true
+        }
+      }
+    },
+    concat: {
+      dist: {
+        files: {
+          'build/angular-aop.js': [
+            './src/aspects/aspect.js',
+            './src/angular-aop.js',
+            './src/aspects/jointpoints/*.js'
+          ]
         }
       }
     },
@@ -43,6 +55,7 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', 'karma:devunit');
 
   grunt.registerTask('test', 'karma:unit');
+  grunt.registerTask('buildStaging', ['test', 'jscs', 'concat']);
   grunt.registerTask('build', ['test', 'jscs', 'uglify']);
 
   grunt.registerTask('default', 'uglify');
