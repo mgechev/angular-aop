@@ -107,7 +107,7 @@ Added tests for:
 
 Add JSCS and update Gruntfile.js
 
-## v0.3.0
+## v0.3.1
 
 - `deep` config property, which allows adding wrappers to prototype methods
 - Fix `forceObject`
