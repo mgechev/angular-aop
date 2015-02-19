@@ -56,7 +56,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', 'karma:unit');
   grunt.registerTask('buildStaging', ['test', 'jscs', 'concat']);
-  grunt.registerTask('build', ['test', 'jscs', 'uglify']);
+  grunt.registerTask('build', ['test', 'jscs', 'uglify', 'concat']);
 
   grunt.registerTask('default', 'uglify');
 };
