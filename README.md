@@ -107,6 +107,11 @@ Added tests for:
 
 Add JSCS and update Gruntfile.js
 
+## v0.3.0
+
+- `deep` config property, which allows adding wrappers to prototype methods
+- Fix `forceObject`
+
 # Roadmap
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
