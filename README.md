@@ -112,6 +112,11 @@ Add JSCS and update Gruntfile.js
 - `deep` config property, which allows adding wrappers to prototype methods
 - Fix `forceObject`
 
+## v0.3.1
+
+- Wrap the non-minified code in build in IIFE ([Issue 15](https://github.com/mgechev/angular-aop/pull/15))
+- Single `'use strict';` at the top of the IIFE
+
 # Roadmap
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
