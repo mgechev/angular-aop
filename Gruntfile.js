@@ -32,10 +32,10 @@ module.exports = function (grunt) {
             './src/aspects/jointpoints/*.js'
           ]
         },
-          options: {
-              banner: "(function(){ \n ",
-              footer: "\n})();"
-          }
+        options: {
+          banner: '(function(){ \n ',
+          footer: '\n})();'
+        }
       }
     },
     karma: {
