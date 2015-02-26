@@ -1,5 +1,5 @@
+(function () {
 'use strict';
-
 function Aspect(advice) {
   this._advice = advice;
   this._wrapperFunc = null;
@@ -34,8 +34,6 @@ Aspect.prototype.invoke = function (params) {
  * @version <%= version =>
  * @license http://opensource.org/licenses/MIT MIT
  */
-
-'use strict';
 
 var AngularAop = angular.module('AngularAOP', []);
 
@@ -319,8 +317,6 @@ AngularAop.provider('execute', function executeProvider() {
 });
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.AFTER] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.AFTER;
@@ -336,8 +332,6 @@ Aspects[JOINT_POINTS.AFTER].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect, MaybeQ */
-'use strict';
-
 Aspects[JOINT_POINTS.AFTER_RESOLVE] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.AFTER_RESOLVE;
@@ -370,8 +364,6 @@ Aspects[JOINT_POINTS.AFTER_RESOLVE].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect, MaybeQ */
-'use strict';
-
 Aspects[JOINT_POINTS.AROUND_ASYNC] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.AROUND_ASYNC;
@@ -398,8 +390,6 @@ Aspects[JOINT_POINTS.AROUND_ASYNC].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.AROUND] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.AROUND;
@@ -417,8 +407,6 @@ Aspects[JOINT_POINTS.AROUND].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect, MaybeQ */
-'use strict';
-
 Aspects[JOINT_POINTS.BEFORE_ASYNC] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.BEFORE_ASYNC;
@@ -438,8 +426,6 @@ Aspects[JOINT_POINTS.BEFORE_ASYNC].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.BEFORE] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.BEFORE;
@@ -452,8 +438,6 @@ Aspects[JOINT_POINTS.BEFORE].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.ON_REJECT] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.ON_REJECT;
@@ -477,8 +461,6 @@ Aspects[JOINT_POINTS.ON_REJECT].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.ON_RESOLVE] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.ON_RESOLVE;
@@ -503,8 +485,6 @@ Aspects[JOINT_POINTS.ON_RESOLVE].prototype._wrapper = function (params) {
 };
 
 /* global Aspects, JOINT_POINTS, Aspect */
-'use strict';
-
 Aspects[JOINT_POINTS.ON_THROW] = function () {
   Aspect.apply(this, arguments);
   this.when = JOINT_POINTS.ON_THROW;
@@ -523,3 +503,5 @@ Aspects[JOINT_POINTS.ON_THROW].prototype._wrapper = function (params) {
   }
   return result;
 };
+
+}());

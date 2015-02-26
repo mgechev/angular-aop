@@ -33,8 +33,12 @@ module.exports = function (grunt) {
           ]
         },
         options: {
-          banner: '(function(){ \n ',
-          footer: '\n})();'
+          banner: '(function () {\n\'use strict\';\n',
+          footer: '\n}());',
+          process: function (src) {
+            return src
+             .replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+          }
         }
       }
     },
@@ -62,5 +66,5 @@ module.exports = function (grunt) {
   grunt.registerTask('buildStaging', ['test', 'jscs', 'concat']);
   grunt.registerTask('build', ['test', 'jscs', 'uglify', 'concat']);
 
-  grunt.registerTask('default', 'uglify');
+  grunt.registerTask('default', 'build');
 };
