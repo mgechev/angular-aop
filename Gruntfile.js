@@ -31,7 +31,11 @@ module.exports = function (grunt) {
             './src/angular-aop.js',
             './src/aspects/jointpoints/*.js'
           ]
-        }
+        },
+          options: {
+              banner: "(function(){ \n ",
+              footer: "\n})();"
+          }
       }
     },
     karma: {
