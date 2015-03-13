@@ -120,7 +120,7 @@ AngularAop.provider('execute', function executeProvider() {
 
     //Builds specified aspect
   var AspectBuilder = {
-      buildAspect: function (advice, jointPoint) {
+      createAspectFactory: function (advice, jointPoint) {
         var self = this;
         return function (target, rules) {
           if (typeof target === 'function' && !rules.forceObject) {
@@ -224,23 +224,23 @@ AngularAop.provider('execute', function executeProvider() {
       throw new Error('The advice should be a function');
     }
     this[JOINT_POINTS.BEFORE] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.BEFORE);
     this[JOINT_POINTS.BEFORE_ASYNC] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.BEFORE_ASYNC);
     this[JOINT_POINTS.AFTER] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AFTER);
     this[JOINT_POINTS.AROUND] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AROUND);
     this[JOINT_POINTS.AROUND_ASYNC] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AROUND_ASYNC);
     this[JOINT_POINTS.ON_THROW] =
-      AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_THROW);
     this[JOINT_POINTS.ON_RESOLVE] =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_RESOLVE);
     this[JOINT_POINTS.AFTER_RESOLVE] =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AFTER_RESOLVE);
     this[JOINT_POINTS.ON_REJECT] =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_REJECT);
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_REJECT);
   }
 
   function applyAspects($provide, target, aspects) {
