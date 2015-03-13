@@ -25,5 +25,4 @@ describe('Around async joint-point', function () {
       var methodCalled = false;
       onResolve._wrapper(params);
     });
-
 });

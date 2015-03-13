@@ -16,15 +16,15 @@ var Aspects = {};
 
   //Defines all joint points
 var JOINT_POINTS = {
-  BEFORE: 'Before',
-  BEFORE_ASYNC: 'BeforeAsync',
-  AFTER: 'After',
-  AROUND: 'Around',
-  AROUND_ASYNC: 'AroundAsync',
-  ON_THROW: 'OnThrow',
-  ON_RESOLVE: 'OnResolve',
-  AFTER_RESOLVE: 'AfterResolve',
-  ON_REJECT: 'OnReject'
+  BEFORE: 'before',
+  BEFORE_ASYNC: 'beforeAsync',
+  AFTER: 'after',
+  AROUND: 'around',
+  AROUND_ASYNC: 'aroundAsync',
+  ON_THROW: 'onThrow',
+  ON_RESOLVE: 'onResolve',
+  AFTER_RESOLVE: 'afterResolve',
+  ON_REJECT: 'onReject'
 };
 
 var MaybeQ = null;
@@ -223,19 +223,23 @@ AngularAop.provider('execute', function executeProvider() {
     if (typeof advice !== 'function') {
       throw new Error('The advice should be a function');
     }
-    this.before = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
-    this.beforeAsync =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
-    this.after = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
-    this.around = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
-    this.aroundAsync =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
-    this.onThrowOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
-    this.onResolveOf =
+    this[JOINT_POINTS.BEFORE] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
+    this[JOINT_POINTS.BEFORE_ASYNC] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
+    this[JOINT_POINTS.AFTER] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
+    this[JOINT_POINTS.AROUND] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
+    this[JOINT_POINTS.AROUND_ASYNC] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
+    this[JOINT_POINTS.ON_THROW] =
+      AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
+    this[JOINT_POINTS.ON_RESOLVE] =
         AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
-    this.afterResolveOf =
+    this[JOINT_POINTS.AFTER_RESOLVE] =
         AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
-    this.onRejectOf =
+    this[JOINT_POINTS.ON_REJECT] =
         AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_REJECT);
   }
 
