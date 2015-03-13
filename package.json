@@ -1,9 +1,15 @@
 {
-  "name": "Angular-AOP",
-  "version": "0.1.1",
+  "name": "angular-aop",
+  "version": "0.3.2",
+  "description": "Framework for aspect-oriented programming with AngularJS",
+  "author": "Minko Gechev <mgechev@gmail.com>",
+  "main": "./build/angular-aop.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mgechev/angular-aop"
+  },
+  "dependencies": {
+    "angular": ">=1.2.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -17,5 +23,6 @@
     "karma-jasmine": "^0.3.5",
     "karma-phantomjs-launcher": "^0.1.4",
     "phantom-jasmine": "^0.3.0"
-  }
+  },
+  "license": "MIT"
 }
