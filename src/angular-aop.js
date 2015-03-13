@@ -271,7 +271,7 @@ AngularAop.provider('execute', function executeProvider() {
     }]);
   }
 
-  return {
+  var api = {
 
     annotate: function ($provide, annotations) {
       var aspects;
@@ -290,6 +290,9 @@ AngularAop.provider('execute', function executeProvider() {
         return new AspectCollection(advice);
       };
     }]
-
   };
+
+  angular.extend(api, JOINT_POINTS);
+
+  return api;
 });
