@@ -5,7 +5,6 @@ describe('Around async joint-point', function () {
 
   it('should invoke the advice after the method was resolved',
     function (done) {
-      var adviceCalled = 0;
       var onResolve = new Aspects[JOINT_POINTS.AROUND_ASYNC](function () {
         adviceCalled += 1;
         if (adviceCalled === 2) {
@@ -22,8 +21,9 @@ describe('Around async joint-point', function () {
         },
         context: {}
       };
-      var adviceCalled = false;
+      var adviceCalled = 0;
       var methodCalled = false;
       onResolve._wrapper(params);
     });
+
 });
