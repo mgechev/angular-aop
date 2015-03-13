@@ -1,4 +1,4 @@
-<img src="https://travis-ci.org/mgechev/angular-aop.svg?branch=master" alt="">
+<img src="https://travis-ci.org/mgechev/angular-aop.svg?branch=master" height="18" alt="">
 [![Join the chat at https://gitter.im/mgechev/angular-aop](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mgechev/angular-aop?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Online demo
