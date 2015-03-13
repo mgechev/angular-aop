@@ -42,15 +42,15 @@ var Aspects = {};
 
   //Defines all joint points
 var JOINT_POINTS = {
-  BEFORE: 'Before',
-  BEFORE_ASYNC: 'BeforeAsync',
-  AFTER: 'After',
-  AROUND: 'Around',
-  AROUND_ASYNC: 'AroundAsync',
-  ON_THROW: 'OnThrow',
-  ON_RESOLVE: 'OnResolve',
-  AFTER_RESOLVE: 'AfterResolve',
-  ON_REJECT: 'OnReject'
+  BEFORE: 'before',
+  BEFORE_ASYNC: 'beforeAsync',
+  AFTER: 'after',
+  AROUND: 'around',
+  AROUND_ASYNC: 'aroundAsync',
+  ON_THROW: 'onThrow',
+  ON_RESOLVE: 'onResolve',
+  AFTER_RESOLVE: 'afterResolve',
+  ON_REJECT: 'onReject'
 };
 
 var MaybeQ = null;
@@ -146,7 +146,7 @@ AngularAop.provider('execute', function executeProvider() {
 
     //Builds specified aspect
   var AspectBuilder = {
-      buildAspect: function (advice, jointPoint) {
+      createAspectFactory: function (advice, jointPoint) {
         var self = this;
         return function (target, rules) {
           if (typeof target === 'function' && !rules.forceObject) {
@@ -249,20 +249,24 @@ AngularAop.provider('execute', function executeProvider() {
     if (typeof advice !== 'function') {
       throw new Error('The advice should be a function');
     }
-    this.before = AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE);
-    this.beforeAsync =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.BEFORE_ASYNC);
-    this.after = AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER);
-    this.around = AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND);
-    this.aroundAsync =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.AROUND_ASYNC);
-    this.onThrowOf = AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_THROW);
-    this.onResolveOf =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_RESOLVE);
-    this.afterResolveOf =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.AFTER_RESOLVE);
-    this.onRejectOf =
-        AspectBuilder.buildAspect(advice, JOINT_POINTS.ON_REJECT);
+    this[JOINT_POINTS.BEFORE] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.BEFORE);
+    this[JOINT_POINTS.BEFORE_ASYNC] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.BEFORE_ASYNC);
+    this[JOINT_POINTS.AFTER] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AFTER);
+    this[JOINT_POINTS.AROUND] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AROUND);
+    this[JOINT_POINTS.AROUND_ASYNC] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AROUND_ASYNC);
+    this[JOINT_POINTS.ON_THROW] =
+      AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_THROW);
+    this[JOINT_POINTS.ON_RESOLVE] =
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_RESOLVE);
+    this[JOINT_POINTS.AFTER_RESOLVE] =
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.AFTER_RESOLVE);
+    this[JOINT_POINTS.ON_REJECT] =
+        AspectBuilder.createAspectFactory(advice, JOINT_POINTS.ON_REJECT);
   }
 
   function applyAspects($provide, target, aspects) {
@@ -293,7 +297,7 @@ AngularAop.provider('execute', function executeProvider() {
     }]);
   }
 
-  return {
+  var api = {
 
     annotate: function ($provide, annotations) {
       var aspects;
@@ -312,8 +316,11 @@ AngularAop.provider('execute', function executeProvider() {
         return new AspectCollection(advice);
       };
     }]
-
   };
+
+  angular.extend(api, JOINT_POINTS);
+
+  return api;
 });
 
 /* global Aspects, JOINT_POINTS, Aspect */

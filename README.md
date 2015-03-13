@@ -119,12 +119,32 @@ Add JSCS and update Gruntfile.js
 - Wrap the non-minified code in build in IIFE ([Issue 15](https://github.com/mgechev/angular-aop/pull/15))
 - Single `'use strict';` at the top of the IIFE
 
+## v0.4.0
+
+- Add the joint-point names as constants to the `executeProvider`, so now the following code is valid:
+```javascript
+myModule.config(function ($provide, executeProvider) {
+  executeProvider.annotate($provide, {
+    ServiceToWove: [{
+      jointPoint: executeProvider.ON_THROW,
+      advice: ADVICE_NAME,
+      methodPattern: /Special/
+      argsPattern: [/arg1/, /arg2/]
+    }, {
+      jointPoint: executeProvider.BEFORE,
+      advice: ADVICE_NAME
+    }]
+  });
+});
+```
+
+- Add more tests
+
+
 # Roadmap
 
 1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
-2. Use constants for the joint-point's names
-3. Write solid amount of tests
-4. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
+2. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
 
 # Contributors
 
