@@ -1,4 +1,5 @@
-/* global describe,it,expect,spyOn,afterEach,document,angular,beforeEach */
+/* global describe,it,expect,spyOn,afterEach,
+ document,angular,beforeEach,JOINT_POINTS */
 
 describe('Angular AOP', function () {
   'use strict';
@@ -9,6 +10,20 @@ describe('Angular AOP', function () {
       module = angular.module('AngularAOP');
     }).not.toThrow();
     expect(typeof module).toBe('object');
+  });
+
+  it('should define appropriate interface of the provider', function () {
+    var api = [
+      '$get', 'annotate'
+    ];
+    api = api.concat(Object.keys(JOINT_POINTS));
+    angular.module('demo', ['ng', 'AngularAOP'])
+    .config(function (executeProvider) {
+      api.forEach(function (key) {
+        expect(executeProvider[key]).not.toBeUndefined();
+      });
+    });
+    angular.bootstrap({}, ['demo']);
   });
 
   it('should define service called execute with dependencies in "ng"',
