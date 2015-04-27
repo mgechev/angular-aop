@@ -89,6 +89,11 @@ if (!Object.setPrototypeOf) {
     return setPrototypeOf;
   }(Object, '__proto__'));
 }
+// Last chance to pollyfil it...
+Object.setPrototypeOf = Object.setPrototypeOf || function (obj, proto) {
+  obj.__proto__ = proto;
+  return obj;
+};
 
 /**
  * Service which give access to the pointcuts.
