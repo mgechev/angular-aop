@@ -4,7 +4,7 @@
 # Online demo
 
 
-If you prefer learning by doing (trial and error), come [right this way](http://plnkr.co/edit/R9juR0oe4xT5AHQs5uDF?p=preview).
+If you prefer learning by doing (trial and error), come [right this way](http://plnkr.co/edit/0ThG5wpmWByIXY1db9m2?p=preview).
 
 # API
 
