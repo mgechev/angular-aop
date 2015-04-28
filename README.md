@@ -42,14 +42,6 @@ The joint-points supported in the current version of the framework are:
 
 For additional information about Aspect-Oriented Programming and AngularAOP visit the [project's documentation](https://github.com/mgechev/angular-aop/tree/master/docs) and [this blog post](http://blog.mgechev.com/2013/08/07/aspect-oriented-programming-with-javascript-angularjs/).
 
-# Known issues
-
-## Circular dependency
-
-This is not issue in AngularAOP but something which should be considered when using Dependency Injection.
-
-Note that if the `$injector` tries to get a service that depends on itself, either directly or indirectly you will get error "Circular dependency". To fix this, construct your dependency chain such that there are no circular dependencies. Check the [following article](http://misko.hevery.com/2008/08/01/circular-dependency-in-constructors-and-dependency-injection/), it can give you a basic idea how to procceed.
-
 # Change log
 
 ## v0.1.0
@@ -146,6 +138,14 @@ myModule.config(function ($provide, executeProvider) {
 1. [`joinpoint.proceed()`](https://github.com/mgechev/angular-aop/issues/19)
 2. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
 3. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
+
+# Known issues
+
+## Circular dependency
+
+This is not issue in AngularAOP but something which should be considered when using Dependency Injection.
+
+Note that if the `$injector` tries to get a service that depends on itself, either directly or indirectly you will get error "Circular dependency". To fix this, construct your dependency chain such that there are no circular dependencies. Check the [following article](http://misko.hevery.com/2008/08/01/circular-dependency-in-constructors-and-dependency-injection/), it can give you a basic idea how to procceed.
 
 # Contributors
 
