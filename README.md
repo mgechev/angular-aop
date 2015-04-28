@@ -143,8 +143,9 @@ myModule.config(function ($provide, executeProvider) {
 
 # Roadmap
 
-1. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
-2. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
+1. [`joinpoint.proceed()`](https://github.com/mgechev/angular-aop/issues/19)
+2. *Use proper execution context inside the target services. This will fix the issue of invoking non-woven internal methods.*
+3. More flexible way of defining pointcuts (patching `$provide.provider` might be required)
 
 # Contributors
 
