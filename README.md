@@ -132,6 +132,9 @@ myModule.config(function ($provide, executeProvider) {
 
 - Add more tests
 
+## v0.4.1
+
+- Special polyfill for IE9 of `Object.setPrototypeOf`.
 
 # Roadmap
 
