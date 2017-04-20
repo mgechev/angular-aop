@@ -17,5 +17,5 @@ npm-debug.log
 index.js
 Gruntfile.js
 bower.json
-karma.config.js
+karma.conf.js
 
