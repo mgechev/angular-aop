@@ -1,6 +1,6 @@
 {
   "name": "angular-aop",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Framework for aspect-oriented programming with AngularJS",
   "author": "Minko Gechev <mgechev@gmail.com>",
   "main": "./build/angular-aop.js",
