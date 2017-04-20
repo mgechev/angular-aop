@@ -1,5 +1,4 @@
 node_modules
-build
 demo
 src
 test
@@ -15,4 +14,8 @@ test
 config.gypi
 CVS
 npm-debug.log
+index.js
+Gruntfile.js
+bower.json
+karma.config.js
 
