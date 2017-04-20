@@ -18,4 +18,10 @@ index.js
 Gruntfile.js
 bower.json
 karma.conf.js
+.bowerrc
+.gitignore
+.jscsrc
+.jshintrc
+.travis.yml
+.npmignore
 
